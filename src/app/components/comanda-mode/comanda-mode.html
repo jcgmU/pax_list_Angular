@@ -1,0 +1,11 @@
+<ng-container *ngIf="store.comandaOpen()">
+  <ng-container *ngIf="needsZoneSelection(); else map">
+    <app-zone-selection 
+      (onSelect)="onZoneSelect($event)" 
+      (onClose)="onZoneClose()">
+    </app-zone-selection>
+  </ng-container>
+  <ng-template #map>
+    <app-seat-map-comanda></app-seat-map-comanda>
+  </ng-template>
+</ng-container>

@@ -1,0 +1,107 @@
+<div class="h-screen flex flex-col bg-slate-50 overflow-hidden">
+  <nav class="h-16 shrink-0 bg-white border-b border-slate-200 px-6 flex items-center justify-between z-30">
+    <div class="flex items-center gap-2">
+      <div class="bg-[#E20613] p-2 rounded-xl text-white">
+        <lucide-angular [img]="Plane" size="20"></lucide-angular>
+      </div>
+      <h1 class="font-black text-slate-900 tracking-tight hidden sm:block italic">
+        Avianca <span class="text-[#E20613] not-italic">SeatMap Pro</span>
+      </h1>
+    </div>
+
+    @if (store.manifest()) {
+      <div class="flex items-center gap-3 md:gap-5">
+        <!-- Info del vuelo -->
+        <div class="hidden md:flex flex-col items-end">
+          <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+            Vuelo Activo
+          </span>
+          <span class="text-sm font-bold text-slate-700">
+            {{ store.manifest()?.flightNumber }} · {{ store.manifest()?.origin }} → {{ store.manifest()?.destination }} · {{ store.manifest()?.departureTime }}
+          </span>
+        </div>
+
+        <!-- Override de tipo de servicio -->
+        <div class="relative flex items-center">
+          <select
+            [value]="store.serviceOverride() ?? store.manifest()?.serviceType"
+            (change)="onServiceChange($event)"
+            class="appearance-none pl-3 pr-7 py-1.5 rounded-xl text-xs font-black border transition-all cursor-pointer outline-none focus:ring-2 focus:ring-[#E20613]/30"
+            [ngClass]="{
+              'bg-amber-50 border-amber-200 text-amber-800': store.activeServiceType() === 'INSIGNIA',
+              'bg-blue-50 border-blue-200 text-blue-800': store.activeServiceType() !== 'INSIGNIA',
+              'ring-2 ring-[#E20613]/40': store.serviceOverride()
+            }"
+          >
+            @for (o of SERVICE_OPTIONS; track o.value) {
+              <option [value]="o.value">{{ o.label }}</option>
+            }
+          </select>
+          <lucide-angular
+            [img]="ChevronDown"
+            size="12"
+            class="absolute right-2 pointer-events-none"
+            [ngClass]="store.activeServiceType() === 'INSIGNIA' ? 'text-amber-600' : 'text-blue-600'"
+          ></lucide-angular>
+          @if (store.serviceOverride()) {
+            <span class="ml-1 text-[9px] font-black text-[#E20613] uppercase">override</span>
+          }
+        </div>
+
+        <!-- Botón Comanda con estado de color -->
+        <button
+          (click)="store.openComanda()"
+          class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95"
+          [ngClass]="{
+            'bg-green-600 text-white hover:bg-green-700': store.comandaStatus() === 'complete',
+            'bg-[#E20613] text-white hover:bg-red-700': store.comandaStatus() === 'in-progress',
+            'bg-white text-[#E20613] border border-[#E20613] hover:bg-red-50': store.comandaStatus() === 'empty'
+          }"
+        >
+          <lucide-angular [img]="ChefHat" size="14"></lucide-angular>
+          <span class="hidden sm:inline">Comanda</span>
+        </button>
+
+        <button
+          (click)="store.reset()"
+          class="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-all active:scale-95"
+        >
+          <lucide-angular [img]="RotateCcw" size="14"></lucide-angular>
+          <span class="hidden sm:inline">Cambiar Vuelo</span>
+        </button>
+      </div>
+    } @else {
+      <div class="flex items-center gap-2 text-amber-600 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-100">
+        <lucide-angular [img]="FlaskConical" size="14"></lucide-angular>
+        <span class="text-[10px] font-black uppercase tracking-wider">Modo Demo</span>
+      </div>
+    }
+  </nav>
+
+  <main class="flex-1 min-h-0 flex flex-col overflow-hidden relative">
+    @if (!store.manifest()) {
+      <div class="flex-1 overflow-y-auto">
+        <div class="min-h-full flex items-center justify-center p-6">
+          <app-demo-selector></app-demo-selector>
+        </div>
+      </div>
+    } @else {
+      <div class="flex-1 min-h-0 flex flex-col lg:flex-row lg:h-full lg:overflow-hidden">
+        <div class="flex-1 min-h-0 flex flex-col overflow-y-auto overflow-x-auto lg:flex-row lg:overflow-hidden lg:contents">
+          <app-seat-map></app-seat-map>
+          <app-stats-sidebar></app-stats-sidebar>
+        </div>
+        <app-passenger-modal></app-passenger-modal>
+        <app-comanda-mode></app-comanda-mode>
+      </div>
+    }
+  </main>
+
+  @if (!store.manifest()) {
+    <footer class="lg:hidden h-6 bg-slate-900 text-white flex items-center justify-center">
+      <p class="text-[8px] font-black uppercase tracking-[0.3em] opacity-50">
+        Modo Demo · iPad/Mobile Ready
+      </p>
+    </footer>
+  }
+</div>

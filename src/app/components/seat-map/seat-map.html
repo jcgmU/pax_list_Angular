@@ -1,0 +1,120 @@
+@if (store.manifest(); as manifest) {
+  <div class="flex flex-col lg:flex-row w-full lg:h-full gap-6 fade-in lg:overflow-hidden">
+    <!-- Flight Header (Mobile only) -->
+    <div class="lg:hidden bg-white border-b">
+      <div class="px-4 py-3 flex justify-between items-center">
+        <div>
+          <h2 class="font-bold text-[#E20613]">{{ manifest.flightNumber }}</h2>
+          <p class="text-[10px] text-slate-500 uppercase tracking-tighter">{{ config()?.id }}</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <p class="text-xs font-bold text-slate-700">{{ manifest.date }}</p>
+          <button
+            (click)="toggleSearch()"
+            class="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors"
+          >
+            <lucide-angular [img]="Search" size="18"></lucide-angular>
+          </button>
+        </div>
+      </div>
+      @if (showSearch) {
+        <div class="px-4 pb-3 border-t border-slate-100">
+          <app-search-bar></app-search-bar>
+        </div>
+      }
+    </div>
+
+    <!-- Map Scroll Area -->
+    <div class="flex-1 lg:overflow-y-auto overflow-x-auto pb-20 lg:pb-0 scrollbar-hide">
+      <div class="min-w-max lg:min-w-0 flex flex-col items-center p-8 bg-slate-50">
+        <div class="w-full max-w-2xl bg-white rounded-[40px] shadow-2xl border border-slate-200 p-8 flex flex-col gap-4">
+          @for (element of config()?.elements; track $index) {
+            @if (element.type === 'facility') {
+              <div class="relative w-full py-6 flex flex-col items-center">
+                <!-- Doors indicators -->
+                <div class="absolute left-[-32px] top-1/2 -translate-y-1/2 w-2 h-12 bg-[#E20613] rounded-r-lg shadow-sm" [title]="element.doors"></div>
+                <div class="absolute right-[-32px] top-1/2 -translate-y-1/2 w-2 h-12 bg-[#E20613] rounded-l-lg shadow-sm" [title]="element.doors"></div>
+                
+                <!-- Central Facility Container -->
+                @if (element.components && element.components.length > 0) {
+                  <div class="w-full max-w-sm bg-slate-100 rounded-2xl p-4 flex justify-around items-center border border-slate-200">
+                    @for (comp of element.components; track $index) {
+                      <div class="flex flex-col items-center gap-1 text-slate-400">
+                        <lucide-angular [img]="getIconForComponent(comp.icon)" size="20"></lucide-angular>
+                        <span class="text-[10px] font-bold uppercase tracking-tighter">{{ comp.label }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+                
+                @if (element.doors.includes('OWE') && (!element.components || element.components.length === 0)) {
+                  <div class="w-full border-t-2 border-dashed border-red-200 my-2"></div>
+                }
+              </div>
+            } @else {
+              <!-- Cabin Rendering -->
+              <div class="w-full flex flex-col gap-2">
+                <div class="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-2 text-center">
+                  {{ element.class }} Class
+                </div>
+                
+                @for (rowNum of element.rows; track rowNum) {
+                  <div class="flex justify-center items-center gap-1.5 h-11">
+                    <!-- Row Number Label -->
+                    <div class="w-6 text-[10px] font-bold text-slate-400 text-center">{{ rowNum }}</div>
+                    
+                    @for (col of element.layout; track $index) {
+                      @if (isAisle(col)) {
+                        <div class="w-6"></div>
+                      } @else {
+                        @let seatId = rowNum + col;
+                        <button 
+                          (click)="selectSeat(seatId, element)"
+                          class="relative w-10 h-10 rounded-lg transition-all duration-200 active:scale-95 flex items-center justify-center text-[11px] font-bold shadow-sm"
+                          [ngClass]="[getBgColor(seatId, element), getTextColor(seatId, element), getRingClasses(seatId)]"
+                        >
+                          {{ seatId }}
+
+                          <!-- Badges Layout -->
+                          <div class="absolute -top-1.5 -right-1.5 flex flex-col gap-0.5">
+                            @if (hasWheelchair(seatId)) {
+                              <div class="w-4 h-4 rounded-full bg-blue-500 border-2 border-white flex items-center justify-center text-white shadow-sm">
+                                <lucide-angular [img]="Accessibility" size="8" strokeWidth="3"></lucide-angular>
+                              </div>
+                            }
+                            @if (hasPet(seatId)) {
+                              <div class="w-4 h-4 rounded-full bg-orange-500 border-2 border-white flex items-center justify-center text-white shadow-sm">
+                                <lucide-angular [img]="Dog" size="8" strokeWidth="3"></lucide-angular>
+                              </div>
+                            }
+                            @if (hasMeal(seatId)) {
+                              <div class="w-4 h-4 rounded-full bg-green-500 border-2 border-white flex items-center justify-center text-white shadow-sm">
+                                <lucide-angular [img]="Utensils" size="8" strokeWidth="3"></lucide-angular>
+                              </div>
+                            }
+                            @if (hasMedicalLegal(seatId)) {
+                              <div class="w-4 h-4 rounded-full bg-rose-600 border-2 border-white flex items-center justify-center text-white shadow-sm">
+                                <lucide-angular [img]="AlertCircle" size="8" strokeWidth="3"></lucide-angular>
+                              </div>
+                            }
+                          </div>
+
+                          <!-- Badge comanda completa -->
+                          @if (hasCompleteOrder(seatId)) {
+                            <div class="absolute -bottom-1.5 -left-1.5 w-4 h-4 rounded-full bg-green-500 border-2 border-white flex items-center justify-center text-white shadow-sm">
+                              <lucide-angular [img]="CheckCircle2" size="8" strokeWidth="3"></lucide-angular>
+                            </div>
+                          }
+                        </button>
+                      }
+                    }
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

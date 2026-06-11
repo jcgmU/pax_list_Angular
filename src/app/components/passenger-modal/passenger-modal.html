@@ -1,0 +1,117 @@
+@if (selectedSeat() && manifest()) {
+  <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div
+      class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+      (click)="close()"
+    ></div>
+
+    <div class="relative w-full max-w-lg bg-white rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      <!-- Header -->
+      <div class="p-6 bg-[#E20613] flex justify-between items-center text-white">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-white/20 rounded-xl">
+            <lucide-icon [name]="User" [size]="24"></lucide-icon>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold">{{ selectedSeat() }}</h3>
+            <p class="text-[10px] text-white/70 font-bold uppercase tracking-widest">
+              {{ showComanda() ? 'Pasajero · Business' : 'Detalles del Pasajero' }}
+            </p>
+          </div>
+        </div>
+        <button (click)="close()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+          <lucide-icon [name]="X" [size]="20"></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-8 space-y-8 max-h-[75vh] overflow-y-auto scrollbar-hide">
+        @if (!passenger()) {
+          <div class="flex flex-col items-center justify-center py-12 text-center space-y-4">
+            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-200">
+              <lucide-icon [name]="Info" [size]="32"></lucide-icon>
+            </div>
+            <p class="text-slate-400 font-medium">Este asiento está vacío</p>
+          </div>
+        } @else {
+          <!-- Nombre -->
+          <section>
+            <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-2">
+              Pasajero
+            </label>
+            <div class="text-3xl font-black text-slate-900 leading-tight">
+              {{ passenger()!.lastName }}, <span class="text-[#E20613]">{{ passenger()!.firstName }}</span>
+            </div>
+          </section>
+
+          <!-- Estatus LifeMiles -->
+          <section class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+            <div class="flex items-center gap-2 mb-3">
+              <lucide-icon [name]="Star" [size]="14" class="text-amber-500 fill-amber-500"></lucide-icon>
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                Estatus LifeMiles
+              </span>
+            </div>
+            @if (passenger()!.status) {
+              <div class="flex items-center gap-3">
+                <div
+                  class="px-3 py-1 rounded-full text-xs font-black uppercase"
+                  [ngClass]="getPassengerStatusColor()"
+                >
+                  {{ passenger()!.status }}
+                </div>
+                <span class="text-sm font-bold text-slate-700">
+                  {{ getCodeDescription(passenger()!.status!) }}
+                </span>
+              </div>
+            } @else {
+              <span class="text-sm text-slate-400 italic">Sin estatus frecuente</span>
+            }
+          </section>
+
+          <!-- SSR / Requerimientos -->
+          <section class="space-y-4">
+            <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block">
+              Requerimientos Especiales
+            </label>
+            @if (passenger()!.codes.length > 0) {
+              <div class="grid gap-3">
+                @for (code of passenger()!.codes; track code) {
+                  <div class="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-[#E20613]/20 transition-colors">
+                    <div class="p-2.5 rounded-xl" [ngClass]="getIconInfo(code).iconColor">
+                      <lucide-icon [name]="getIconInfo(code).Icon" [size]="20"></lucide-icon>
+                    </div>
+                    <div>
+                      <div class="text-xs font-black text-slate-900">{{ code }}</div>
+                      <div class="text-[10px] text-slate-500 font-medium">{{ getCodeDescription(code) }}</div>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="p-6 bg-slate-50 rounded-2xl text-center">
+                <p class="text-xs text-slate-400 italic">
+                  No hay servicios especiales registrados
+                </p>
+              </div>
+            }
+          </section>
+
+          <!-- Comanda de comida (solo business) -->
+          @if (showComanda()) {
+            <div class="border-t border-slate-100 pt-6">
+              <app-comanda-form [passenger]="passenger()!"></app-comanda-form>
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Footer -->
+      <div class="p-4 bg-slate-50 text-center border-t border-slate-100">
+        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">
+          Información Confidencial • Solo para uso operativo
+        </p>
+      </div>
+    </div>
+  </div>
+}

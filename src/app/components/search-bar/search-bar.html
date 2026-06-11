@@ -1,0 +1,10 @@
+<div class="relative mb-6">
+  <lucide-angular [img]="Search" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size="18"></lucide-angular>
+  <input
+    type="text"
+    placeholder="Buscar nombre o asiento..."
+    [value]="store.searchTerm()"
+    (input)="onSearch($event)"
+    class="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-[#E20613] transition-all outline-none"
+  />
+</div>
