@@ -68,16 +68,12 @@ export class PassengerModal {
     }
   }
 
-  getPassengerStatusColor() {
-    const status = this.passenger()?.status;
-    if (status === 'MAGN' || status === 'M') {
-      return 'bg-gradient-to-r from-[#3c1053] to-[#ad5389] text-white animate-glow-purple';
-    }
-    if (status === 'DIAM' || status === 'D') {
-      return 'bg-slate-900 text-white';
-    }
-    return 'bg-amber-100 text-amber-700';
-  }
+  filteredCodes = computed(() => {
+    const p = this.passenger();
+    if (!p) return [];
+    const loyaltyCodes = ['MAGN', 'M', 'DIAM', 'D', 'GOLD', 'G', 'SILV', 'SILVER', 'PLUS'];
+    return p.codes.filter(c => !loyaltyCodes.includes(c));
+  });
 
   getIconInfo(code: string) {
     let Icon = this.Info;

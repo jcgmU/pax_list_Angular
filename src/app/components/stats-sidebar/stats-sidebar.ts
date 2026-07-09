@@ -67,7 +67,6 @@ export class StatsSidebar {
       .sort((a, b) => a.seat.localeCompare(b.seat, undefined, { numeric: true }));
   });
 
-  paxTopCount = computed(() => this.magnoPax().length + this.diamondPax().length + this.goldPax().length);
   totalSSR = computed(() => Object.values(this.stats().ssrCounts).reduce((a, b) => a + b, 0));
 
   ssrCodes = computed(() => Object.keys(this.stats().ssrCounts));
