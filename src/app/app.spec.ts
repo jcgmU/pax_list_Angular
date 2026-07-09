@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
 import { StoreService } from './store.service';
+import { FLIGHT_CODES } from '../domain/flightCodes';
+import { countSSR } from '../domain/flightStats';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -141,6 +143,27 @@ describe('App', () => {
       }
     });
     expect(hasPlaneIcon).toBe(true);
+  });
+
+  describe('Magno Loyalty Status', () => {
+    it('should have MAGN and M defined in FLIGHT_CODES.STATUS and exclude them from SSR counts', () => {
+      expect(FLIGHT_CODES.STATUS.MAGN).toBe('LifeMiles Magno');
+      expect(FLIGHT_CODES.STATUS.M).toBe('LifeMiles Magno');
+
+      const mockPassenger = {
+        seat: '1A',
+        firstName: 'John',
+        lastName: 'Doe',
+        codes: ['MAGN', 'M', 'WCHR'],
+        rawText: '1A DOE/JOHN'
+      };
+      const ssrCounts = countSSR([mockPassenger]);
+      // MAGN and M should be recognized as status codes, hence excluded from SSR counts.
+      // Only WCHR should be counted.
+      expect(ssrCounts['MAGN']).toBeUndefined();
+      expect(ssrCounts['M']).toBeUndefined();
+      expect(ssrCounts['WCHR']).toBe(1);
+    });
   });
 });
 

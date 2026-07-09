@@ -38,6 +38,8 @@ export const FLIGHT_CODES = {
     PSML: 'Pasta o vegetariano'
   },
   STATUS: {
+    MAGN: 'LifeMiles Magno',
+    M: 'LifeMiles Magno',
     DIAM: 'LifeMiles Diamond',
     D: 'LifeMiles Diamond',
     GOLD: 'LifeMiles Gold',

@@ -24,7 +24,7 @@ export function countEmptySeats(manifest: FlightManifest, config: AircraftConfig
 
 export function countSSR(passengers: ParsedPassenger[]): Record<string, number> {
   const counts: Record<string, number> = {};
-  const statusCodes = new Set(['DIAM', 'D', 'GOLD', 'G', 'SILV', 'SILVER', 'PLUS', 'BDAY', 'CLIENTE TOP', 'STAFF', 'INF', 'CHD']);
+  const statusCodes = new Set(['MAGN', 'M', 'DIAM', 'D', 'GOLD', 'G', 'SILV', 'SILVER', 'PLUS', 'BDAY', 'CLIENTE TOP', 'STAFF', 'INF', 'CHD']);
 
   for (const p of passengers) {
     for (const code of p.codes) {
