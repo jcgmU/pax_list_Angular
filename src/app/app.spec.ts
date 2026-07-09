@@ -18,6 +18,10 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, pax-map-demo-angular');
+    const h1 = compiled.querySelector('h1');
+    expect(h1?.textContent).toContain('SeatMap Pro');
+    const img = h1?.querySelector('img');
+    expect(img?.getAttribute('src')).toBe('avianca-wordmark.png');
+    expect(img?.getAttribute('alt')).toBe('Avianca');
   });
 });

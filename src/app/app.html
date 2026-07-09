@@ -1,22 +1,26 @@
-<div class="h-screen flex flex-col bg-slate-50 overflow-hidden">
-  <nav class="h-16 shrink-0 bg-white border-b border-slate-200 px-6 flex items-center justify-between z-30">
-    <div class="flex items-center gap-2">
-      <div class="bg-[#E20613] p-2 rounded-xl text-white">
-        <lucide-angular [img]="Plane" size="20"></lucide-angular>
+<div class="h-screen flex flex-col bg-[#f8fafc] overflow-hidden">
+  <nav class="h-16 shrink-0 bg-white/80 backdrop-blur-md border-b border-slate-200/60 px-6 flex items-center justify-between z-30 sticky top-0">
+    <div class="flex items-center gap-3">
+      <div class="bg-white border border-slate-200/80 p-1.5 rounded-xl shadow-sm flex items-center justify-center w-9 h-9">
+        <img src="avianca-symbol.png" alt="Avianca Logo" class="h-6 w-6 object-contain">
       </div>
-      <h1 class="font-black text-slate-900 tracking-tight hidden sm:block italic">
-        Avianca <span class="text-[#E20613] not-italic">SeatMap Pro</span>
-      </h1>
+      <div class="flex flex-col">
+        <h1 class="flex items-center gap-1.5 font-black text-slate-900 tracking-tight text-base leading-none">
+          <img src="avianca-wordmark.png" alt="Avianca" class="h-4.5 w-auto object-contain">
+          <span class="text-[#E20613] font-medium lowercase tracking-normal">SeatMap Pro</span>
+        </h1>
+        <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-1">Crew Operations</span>
+      </div>
     </div>
 
     @if (store.manifest()) {
       <div class="flex items-center gap-3 md:gap-5">
         <!-- Info del vuelo -->
         <div class="hidden md:flex flex-col items-end">
-          <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+          <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">
             Vuelo Activo
           </span>
-          <span class="text-sm font-bold text-slate-700">
+          <span class="text-xs font-bold text-slate-700">
             {{ store.manifest()?.flightNumber }} · {{ store.manifest()?.origin }} → {{ store.manifest()?.destination }} · {{ store.manifest()?.departureTime }}
           </span>
         </div>
@@ -26,11 +30,11 @@
           <select
             [value]="store.serviceOverride() ?? store.manifest()?.serviceType"
             (change)="onServiceChange($event)"
-            class="appearance-none pl-3 pr-7 py-1.5 rounded-xl text-xs font-black border transition-all cursor-pointer outline-none focus:ring-2 focus:ring-[#E20613]/30"
+            class="appearance-none pl-3 pr-8 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer outline-none focus:ring-2 focus:ring-[#E20613]/20"
             [ngClass]="{
               'bg-amber-50 border-amber-200 text-amber-800': store.activeServiceType() === 'INSIGNIA',
               'bg-blue-50 border-blue-200 text-blue-800': store.activeServiceType() !== 'INSIGNIA',
-              'ring-2 ring-[#E20613]/40': store.serviceOverride()
+              'ring-2 ring-[#E20613]/30': store.serviceOverride()
             }"
           >
             @for (o of SERVICE_OPTIONS; track o.value) {
@@ -40,22 +44,22 @@
           <lucide-angular
             [img]="ChevronDown"
             size="12"
-            class="absolute right-2 pointer-events-none"
+            class="absolute right-3 pointer-events-none"
             [ngClass]="store.activeServiceType() === 'INSIGNIA' ? 'text-amber-600' : 'text-blue-600'"
           ></lucide-angular>
           @if (store.serviceOverride()) {
-            <span class="ml-1 text-[9px] font-black text-[#E20613] uppercase">override</span>
+            <span class="ml-1.5 text-[8px] font-black text-[#E20613] bg-red-50 border border-red-200/50 px-1.5 py-0.5 rounded-md uppercase tracking-wider">override</span>
           }
         </div>
 
         <!-- Botón Comanda con estado de color -->
         <button
           (click)="store.openComanda()"
-          class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95"
+          class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-sm hover:shadow-md active:scale-95"
           [ngClass]="{
-            'bg-green-600 text-white hover:bg-green-700': store.comandaStatus() === 'complete',
-            'bg-[#E20613] text-white hover:bg-red-700': store.comandaStatus() === 'in-progress',
-            'bg-white text-[#E20613] border border-[#E20613] hover:bg-red-50': store.comandaStatus() === 'empty'
+            'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 hover:to-teal-700 shadow-emerald-600/10': store.comandaStatus() === 'complete',
+            'bg-gradient-to-r from-[#E20613] to-red-500 text-white hover:from-red-700 hover:to-red-600 shadow-red-500/10': store.comandaStatus() === 'in-progress',
+            'bg-white text-[#E20613] border border-red-200 hover:bg-red-50/50': store.comandaStatus() === 'empty'
           }"
         >
           <lucide-angular [img]="ChefHat" size="14"></lucide-angular>
@@ -64,16 +68,16 @@
 
         <button
           (click)="store.reset()"
-          class="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-all active:scale-95"
+          class="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-xl text-xs font-bold transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-sm active:scale-95"
         >
           <lucide-angular [img]="RotateCcw" size="14"></lucide-angular>
           <span class="hidden sm:inline">Cambiar Vuelo</span>
         </button>
       </div>
     } @else {
-      <div class="flex items-center gap-2 text-amber-600 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-100">
-        <lucide-angular [img]="FlaskConical" size="14"></lucide-angular>
-        <span class="text-[10px] font-black uppercase tracking-wider">Modo Demo</span>
+      <div class="flex items-center gap-2 text-amber-700 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200/50">
+        <lucide-angular [img]="FlaskConical" size="12"></lucide-angular>
+        <span class="text-[9px] font-black uppercase tracking-wider">Modo Demo</span>
       </div>
     }
   </nav>
@@ -86,8 +90,8 @@
         </div>
       </div>
     } @else {
-      <div class="flex-1 min-h-0 flex flex-col lg:flex-row lg:h-full lg:overflow-hidden">
-        <div class="flex-1 min-h-0 flex flex-col overflow-y-auto overflow-x-auto lg:flex-row lg:overflow-hidden lg:contents">
+      <div class="flex-1 min-h-0 flex flex-col md:flex-row md:h-full md:overflow-hidden">
+        <div class="flex-1 min-h-0 flex flex-col overflow-y-auto overflow-x-auto md:flex-row md:overflow-hidden md:contents">
           <app-seat-map></app-seat-map>
           <app-stats-sidebar></app-stats-sidebar>
         </div>
@@ -98,7 +102,7 @@
   </main>
 
   @if (!store.manifest()) {
-    <footer class="lg:hidden h-6 bg-slate-900 text-white flex items-center justify-center">
+    <footer class="md:hidden h-6 bg-slate-900 text-white flex items-center justify-center">
       <p class="text-[8px] font-black uppercase tracking-[0.3em] opacity-50">
         Modo Demo · iPad/Mobile Ready
       </p>
