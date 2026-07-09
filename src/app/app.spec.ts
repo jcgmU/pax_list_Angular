@@ -88,4 +88,59 @@ describe('App', () => {
     expect(selectedFlightNum2).toBeTruthy();
     expect(selectedFlightNum2).not.toBe(selectedFlightNum1);
   });
+
+  it('should use uppercase title branding with specific classes in navigation and selector', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    const brandingSpans = compiled.querySelectorAll('span');
+    let foundNavbarBranding = false;
+    let foundSelectorBranding = false;
+
+    brandingSpans.forEach(span => {
+      if (span.textContent?.includes('SeatMap Pro')) {
+        const classes = span.className;
+        if (classes.includes('uppercase') && classes.includes('font-bold') && classes.includes('tracking-wider')) {
+          if (span.closest('nav')) {
+            foundNavbarBranding = true;
+          } else {
+            foundSelectorBranding = true;
+          }
+        }
+      }
+    });
+
+    expect(foundNavbarBranding).toBe(true);
+    expect(foundSelectorBranding).toBe(true);
+  });
+
+  it('should use lucide plane icon for flight routes', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    const demoSelector = compiled.querySelector('app-demo-selector');
+    expect(demoSelector).toBeTruthy();
+
+    // Verify that the manual <svg> is gone from the flight route container
+    const manualSvgs = demoSelector?.querySelectorAll('div.absolute.bg-white.px-2 > svg');
+    expect(manualSvgs?.length).toBe(0);
+
+    // Verify that it is replaced by lucide-angular with appropriate classes
+    const lucideRouteIcons = demoSelector?.querySelectorAll('div.absolute.bg-white.px-2 > lucide-angular');
+    expect(lucideRouteIcons?.length).toBeGreaterThan(0);
+    
+    let hasPlaneIcon = false;
+    lucideRouteIcons?.forEach(icon => {
+      const classes = icon.className;
+      if (classes.includes('rotate-90') && classes.includes('text-[#E20613]') && classes.includes('group-hover:translate-x-3')) {
+        hasPlaneIcon = true;
+      }
+    });
+    expect(hasPlaneIcon).toBe(true);
+  });
 });
+

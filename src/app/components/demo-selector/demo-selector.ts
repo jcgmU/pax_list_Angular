@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, ArrowRight, Users, Clock, ChefHat } from 'lucide-angular';
+import { LucideAngularModule, ArrowRight, Users, Clock, ChefHat, Plane } from 'lucide-angular';
 import { StoreService } from '../../store.service';
 import { DEMO_FLIGHTS } from '../../../infrastructure/mockData';
 import { deriveMealSlots } from '../../../domain/mealService';
@@ -38,6 +38,7 @@ export class DemoSelector {
   readonly Users = Users;
   readonly Clock = Clock;
   readonly ChefHat = ChefHat;
+  readonly Plane = Plane;
 
   flights = DEMO_FLIGHTS.map((flight, i) => {
     return {
