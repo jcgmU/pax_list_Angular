@@ -211,6 +211,55 @@ describe('App', () => {
       expect(magnoText).toContain('1A');
       expect(magnoText).toContain('1C');
     });
+
+    it('should style Magno seats and render Crown badge on the Seat Map', async () => {
+      const fixture = TestBed.createComponent(App);
+      const store = TestBed.inject(StoreService);
+      await fixture.whenStable();
+
+      store.setManifest({
+        flightNumber: 'AV210',
+        date: '03 JUN 2026',
+        aircraftType: 'A320',
+        origin: 'BOG',
+        destination: 'JFK',
+        departureTime: '07:20',
+        serviceType: 'AMERICAS',
+        infantCount: 0,
+        passengers: [
+          {
+            seat: '1A',
+            firstName: 'CARLOS',
+            lastName: 'RAMIREZ',
+            status: 'MAGN',
+            codes: ['MAGN'],
+            rawText: '1A RAMIREZ/CARLOS'
+          }
+        ]
+      });
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+      const seatMap = compiled.querySelector('app-seat-map');
+      expect(seatMap).toBeTruthy();
+
+      // Get button for seat 1A
+      const buttons = Array.from(seatMap!.querySelectorAll('button'));
+      const seatButton = buttons.find(b => b.textContent?.includes('1A'))!;
+      expect(seatButton).toBeTruthy();
+
+      // The seat class should contain the premium styling classes we require
+      const classes = seatButton.className;
+      expect(classes).toContain('bg-gradient-to-br');
+      expect(classes).toContain('from-[#3c1053]');
+      expect(classes).toContain('to-[#ad5389]');
+      expect(classes).toContain('border-purple-950');
+      expect(classes).toContain('animate-glow-purple');
+
+      // Verify Crown icon badge is rendered in the top right of the seat button
+      const crownIcon = seatButton.querySelector('lucide-angular[strokeWidth="3"]');
+      expect(crownIcon).toBeTruthy();
+    });
   });
 });
 

@@ -1,7 +1,7 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StoreService } from '../../store.service';
-import { LucideAngularModule, Coffee, Bath, Box, Accessibility, Dog, Utensils, AlertCircle, Search, CheckCircle2 } from 'lucide-angular';
+import { LucideAngularModule, Coffee, Bath, Box, Accessibility, Dog, Utensils, AlertCircle, Search, CheckCircle2, Star, AlertTriangle, Crown } from 'lucide-angular';
 import { AIRCRAFT_CONFIGS, AircraftElement } from '../../../domain/aircraftConfigs';
 import { getAircraftConfigKey } from '../../../domain/aircraftMatch';
 import { getCabinClass } from '../../../domain/cabinLookup';
@@ -30,6 +30,9 @@ export class SeatMap {
   readonly Utensils = Utensils;
   readonly AlertCircle = AlertCircle;
   readonly CheckCircle2 = CheckCircle2;
+  readonly Star = Star;
+  readonly AlertTriangle = AlertTriangle;
+  readonly Crown = Crown;
 
   configKey = computed(() => {
     const man = this.store.manifest();
@@ -96,31 +99,44 @@ export class SeatMap {
   }
 
   getBgColor(seatId: string, element: AircraftElement): string {
-    if (this.isBlocked(element, seatId)) return 'bg-slate-800 opacity-20 cursor-not-allowed';
+    if (this.isBlocked(element, seatId)) return 'bg-slate-100/50 border border-dashed border-slate-200 pointer-events-none opacity-40';
     const pax = this.getPassenger(seatId);
     if (pax) {
-      if (pax.status === 'DIAM' || pax.status === 'D') return 'bg-slate-900';
-      if (pax.status === 'GOLD' || pax.status === 'G') return 'bg-amber-400';
-      return 'bg-[#E20613]/10';
+      if (pax.status === 'MAGN' || pax.status === 'M') return 'bg-gradient-to-br from-[#3c1053] to-[#ad5389] border border-purple-950 shadow-sm animate-glow-purple';
+      if (pax.status === 'DIAM' || pax.status === 'D') return 'bg-slate-900 border border-slate-950 shadow-sm';
+      if (pax.status === 'GOLD' || pax.status === 'G') return 'bg-gradient-to-br from-amber-400 to-amber-500 border border-amber-600/30 shadow-sm';
+      return 'bg-red-50/70 border border-red-100 shadow-sm';
     }
-    return 'bg-slate-200'; // Libre
+    return 'bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50'; // Libre
   }
 
   getTextColor(seatId: string, element: AircraftElement): string {
     if (this.isBlocked(element, seatId)) return 'text-transparent';
     const pax = this.getPassenger(seatId);
     if (pax) {
-      if (pax.status === 'GOLD' || pax.status === 'G') return 'text-slate-900';
-      if (pax.status !== 'DIAM' && pax.status !== 'D') return 'text-[#E20613] font-black';
-      return 'text-white';
+      if (pax.status === 'GOLD' || pax.status === 'G') return 'text-amber-950';
+      if (pax.status === 'MAGN' || pax.status === 'M') return 'text-white font-extrabold';
+      if (pax.status !== 'DIAM' && pax.status !== 'D') return 'text-[#E20613] font-extrabold';
+      return 'text-white font-extrabold';
     }
-    return 'text-slate-400'; // Libre
+    return 'text-slate-400 font-semibold'; // Libre
   }
 
   getRingClasses(seatId: string): string {
-    if (this.store.selectedSeat() === seatId) return 'ring-4 ring-[#E20613] ring-offset-2 z-10';
-    if (this.isHighlighted(seatId)) return 'ring-4 ring-amber-400 ring-offset-1 z-10 animate-pulse';
+    if (this.store.selectedSeat() === seatId) return 'ring-2 ring-[#E20613] ring-offset-2 scale-105 z-10';
+    if (this.hasNpsAlert(seatId)) return 'ring-2 ring-rose-500 animate-glow-rose z-10';
+    if (this.isHighlighted(seatId)) return 'ring-2 ring-amber-500 animate-glow-gold z-10';
     return '';
+  }
+
+  hasNpsAlert(seatId: string): boolean {
+    const pax = this.getPassenger(seatId);
+    return pax?.nps !== undefined && pax.nps.score <= 6 && !pax.nps.recovered;
+  }
+
+  isNpsRecovered(seatId: string): boolean {
+    const pax = this.getPassenger(seatId);
+    return pax?.nps !== undefined && pax.nps.recovered;
   }
 
   hasWheelchair(seatId: string) {
@@ -139,6 +155,21 @@ export class SeatMap {
     return this.getPassenger(seatId)?.codes.some(c =>
       Object.keys(FLIGHT_CODES.MEDICAL).includes(c) || Object.keys(FLIGHT_CODES.LEGAL).includes(c)
     );
+  }
+
+  isMagno(seatId: string) {
+    const pax = this.getPassenger(seatId);
+    return pax?.status === 'MAGN' || pax?.status === 'M';
+  }
+
+  isDiamond(seatId: string) {
+    const pax = this.getPassenger(seatId);
+    return pax?.status === 'DIAM' || pax?.status === 'D';
+  }
+
+  isGold(seatId: string) {
+    const pax = this.getPassenger(seatId);
+    return pax?.status === 'GOLD' || pax?.status === 'G';
   }
 
   selectSeat(seatId: string, element: AircraftElement) {
