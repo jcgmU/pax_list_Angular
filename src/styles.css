@@ -1,3 +1,176 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
 @import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', sans-serif;
+  --font-display: 'Outfit', sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #f8fafc; /* slate-50 */
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+}
+
+/* Custom premium scrollbars */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Glassmorphism effects */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.glass-panel-dark {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Glowing alerts and status effects */
+@keyframes pulse-glow-rose {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(244, 63, 94, 0.4);
+    border-color: rgba(244, 63, 94, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(244, 63, 94, 0.8);
+    border-color: rgba(244, 63, 94, 0.9);
+  }
+}
+
+.animate-glow-rose {
+  animation: pulse-glow-rose 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow-gold {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+  }
+}
+
+.animate-glow-gold {
+  animation: pulse-glow-gold 2.5s infinite ease-in-out;
+}
+
+@keyframes pulse-glow-purple {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(168, 85, 247, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
+  }
+}
+
+.animate-glow-purple {
+  animation: pulse-glow-purple 2.5s infinite ease-in-out;
+}
+
+/* Ticket curve cuts for boarding passes */
+.ticket-cut {
+  position: relative;
+}
+.ticket-cut::before,
+.ticket-cut::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: #f8fafc; /* Match container background */
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+.ticket-cut::before {
+  left: -8px;
+}
+.ticket-cut::after {
+  right: -8px;
+}
+
+/* Easing and Animation Variables */
+:root {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-feedback: 150ms;
+  --duration-state: 250ms;
+  --duration-layout: 350ms;
+  --duration-entrance: 650ms;
+}
+
+/* Staggered card entrance */
+@keyframes fade-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-stagger-item {
+  opacity: 0;
+  animation: fade-slide-up var(--duration-entrance) var(--ease-out-expo) forwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+/* Slide in from right for sidebar elements */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right var(--duration-layout) var(--ease-out-expo) forwards;
+}
+
+/* Scale and fade modal entrance */
+@keyframes modal-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-entry {
+  animation: modal-zoom-in var(--duration-layout) var(--ease-out-expo) forwards;
+}
+
+/* Accessibility: prefers-reduced-motion check */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
