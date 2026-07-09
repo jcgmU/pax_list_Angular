@@ -5,7 +5,7 @@ import { SearchBar } from '../search-bar/search-bar';
 import { 
   LucideAngularModule, 
   Users, Utensils, Accessibility, Baby, BarChart2, ChevronDown, 
-  Star, Diamond, ChefHat, Bell, CheckCircle2 
+  Star, Diamond, ChefHat, Bell, CheckCircle2, Crown
 } from 'lucide-angular';
 import { ParsedPassenger } from '../../../infrastructure/mockData';
 import { getCabinClass } from '../../../domain/cabinLookup';
@@ -32,6 +32,7 @@ export class StatsSidebar {
   readonly ChefHat = ChefHat;
   readonly Bell = Bell;
   readonly CheckCircle2 = CheckCircle2;
+  readonly Crown = Crown;
 
   isOpen = signal(false);
   expandedCode = signal<string | null>(null);
@@ -41,6 +42,14 @@ export class StatsSidebar {
   stats = this.store.flightStats;
   orders = this.store.orders;
   unavailable = this.store.unavailable;
+
+  magnoPax = computed(() => {
+    const m = this.manifest();
+    if (!m) return [];
+    return m.passengers
+      .filter(p => ['MAGN', 'M'].includes(p.status ?? ''))
+      .sort((a, b) => a.seat.localeCompare(b.seat, undefined, { numeric: true }));
+  });
 
   diamondPax = computed(() => {
     const m = this.manifest();
@@ -58,7 +67,7 @@ export class StatsSidebar {
       .sort((a, b) => a.seat.localeCompare(b.seat, undefined, { numeric: true }));
   });
 
-  paxTopCount = computed(() => this.diamondPax().length + this.goldPax().length);
+  paxTopCount = computed(() => this.magnoPax().length + this.diamondPax().length + this.goldPax().length);
   totalSSR = computed(() => Object.values(this.stats().ssrCounts).reduce((a, b) => a + b, 0));
 
   ssrCodes = computed(() => Object.keys(this.stats().ssrCounts));

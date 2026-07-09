@@ -164,6 +164,53 @@ describe('App', () => {
       expect(ssrCounts['M']).toBeUndefined();
       expect(ssrCounts['WCHR']).toBe(1);
     });
+
+    it('should aggregate and render Magno passengers in the Stats Sidebar', async () => {
+      const fixture = TestBed.createComponent(App);
+      const store = TestBed.inject(StoreService);
+      await fixture.whenStable();
+
+      store.setManifest({
+        flightNumber: 'AV210',
+        date: '03 JUN 2026',
+        aircraftType: 'A320',
+        origin: 'BOG',
+        destination: 'JFK',
+        departureTime: '07:20',
+        serviceType: 'AMERICAS',
+        infantCount: 0,
+        passengers: [
+          {
+            seat: '1A',
+            firstName: 'CARLOS',
+            lastName: 'RAMIREZ',
+            status: 'MAGN',
+            codes: ['MAGN'],
+            rawText: '1A RAMIREZ/CARLOS'
+          },
+          {
+            seat: '1C',
+            firstName: 'ANDRES',
+            lastName: 'BOTERO',
+            status: 'M',
+            codes: ['M'],
+            rawText: '1C BOTERO/ANDRES'
+          }
+        ]
+      });
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+      const sidebar = compiled.querySelector('app-stats-sidebar');
+      expect(sidebar).toBeTruthy();
+
+      // At this point, the HTML should display the Magno passengers, but since we haven't implemented it,
+      // it should fail to find "Magno" text/section or fail during compilation.
+      const magnoText = sidebar?.textContent;
+      expect(magnoText).toContain('Magno');
+      expect(magnoText).toContain('1A');
+      expect(magnoText).toContain('1C');
+    });
   });
 });
 
