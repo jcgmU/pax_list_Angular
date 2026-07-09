@@ -4,6 +4,7 @@ import { StoreService } from './store.service';
 import { FLIGHT_CODES } from '../domain/flightCodes';
 import { countSSR } from '../domain/flightStats';
 import { Crown } from 'lucide-angular';
+import { FLIGHT_AV210, FLIGHT_AV026, FLIGHT_AV120 } from '../infrastructure/mockData';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -314,6 +315,23 @@ describe('App', () => {
         return icon.innerHTML.includes('M11.562 3.266');
       });
       expect(hasCrownIcon).toBe(true);
+    });
+
+    it('should have mock data containing MAGN passengers', () => {
+      // Carlos Ramirez in FLIGHT_AV210
+      const ramirez = FLIGHT_AV210.passengers.find(p => p.lastName === 'RAMIREZ' && p.firstName === 'CARLOS');
+      expect(ramirez?.status).toBe('MAGN');
+      expect(ramirez?.codes).toContain('MAGN');
+
+      // Rafael Echeverri in FLIGHT_AV026
+      const echeverri = FLIGHT_AV026.passengers.find(p => p.lastName === 'ECHEVERRI' && p.firstName === 'RAFAEL');
+      expect(echeverri?.status).toBe('MAGN');
+      expect(echeverri?.codes).toContain('MAGN');
+
+      // Gustavo Llinás in FLIGHT_AV120
+      const llinas = FLIGHT_AV120.passengers.find(p => p.lastName === 'LLINÁS' && p.firstName === 'GUSTAVO');
+      expect(llinas?.status).toBe('MAGN');
+      expect(llinas?.codes).toContain('MAGN');
     });
   });
 });

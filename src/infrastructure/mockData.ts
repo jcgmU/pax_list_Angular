@@ -1,5 +1,11 @@
 import type { ServiceType } from '../domain/mealService';
 
+export interface NPSData {
+  score: number; // 0-10
+  comment: string;
+  recovered: boolean;
+}
+
 export interface ParsedPassenger {
   seat: string;
   firstName: string;
@@ -7,6 +13,7 @@ export interface ParsedPassenger {
   status?: string;
   codes: string[];
   rawText: string;
+  nps?: NPSData;
 }
 
 export interface FlightManifest {
@@ -36,6 +43,18 @@ const pax = (
   rawText: `${seat} ${lastName}/${firstName}`,
 });
 
+const paxWithNps = (
+  seat: string,
+  lastName: string,
+  firstName: string,
+  status: string | undefined,
+  codes: string[],
+  nps: NPSData
+): ParsedPassenger => ({
+  ...pax(seat, lastName, firstName, status, codes),
+  nps
+});
+
 // ─── Vuelo 1: AV210 BOG → JFK — 07:20 — Business Class Americas ──────────────
 // 1 servicio: Desayuno (solo plato fuerte, sin entrada, sin despertar)
 export const FLIGHT_AV210: FlightManifest = {
@@ -49,7 +68,7 @@ export const FLIGHT_AV210: FlightManifest = {
   infantCount: 2,
   passengers: [
     // Business Class (filas 1-3, layout A/C/D/K)
-    pax('1A', 'RAMIREZ', 'CARLOS', 'DIAM'),
+    pax('1A', 'RAMIREZ', 'CARLOS', 'MAGN'),
     pax('1C', 'BOTERO', 'ANDRES', 'GOLD'),
     pax('1D', 'OSPINA', 'LUCIA', 'DIAM'),
     pax('1K', 'VILLA', 'CATALINA'),
@@ -57,7 +76,7 @@ export const FLIGHT_AV210: FlightManifest = {
     pax('2C', 'CARDONA', 'PEDRO', 'DIAM'),
     pax('2D', 'RESTREPO', 'ANA'),
     pax('2K', 'ZAPATA', 'DIANA'),
-    pax('3A', 'ARANGO', 'JUAN'),
+    paxWithNps('3A', 'ARANGO', 'JUAN', undefined, [], { score: 2, comment: 'Pérdida de equipaje en vuelo anterior MAD-BOG. Muy molesto.', recovered: false }),
     pax('3C', 'RIOS', 'FELIPE'),
     pax('3D', 'VELASQUEZ', 'SOFIA', 'GOLD'),
     pax('3K', 'GARCIA', 'VALENTINA'),
@@ -201,7 +220,7 @@ export const FLIGHT_AV026: FlightManifest = {
   infantCount: 1,
   passengers: [
     // Business Class
-    pax('1A', 'ECHEVERRI', 'RAFAEL', 'DIAM'),
+    pax('1A', 'ECHEVERRI', 'RAFAEL', 'MAGN'),
     pax('1D', 'PALACIO', 'HELENA', 'DIAM'),
     pax('1E', 'ARBOLEDA', 'SERGIO', 'GOLD'),
     pax('1K', 'VELEZ', 'CRISTINA'),
@@ -212,7 +231,7 @@ export const FLIGHT_AV026: FlightManifest = {
     pax('3A', 'VILLA', 'DIANA', 'DIAM'),
     pax('3D', 'ZULUAGA', 'ERNESTO'),
     pax('3E', 'AGUDELO', 'FERNANDA', 'GOLD'),
-    pax('3K', 'BETANCUR', 'GONZALO'),
+    paxWithNps('3K', 'BETANCUR', 'GONZALO', undefined, [], { score: 4, comment: 'Vuelo anterior con retraso de 4 horas sin compensación.', recovered: false }),
     pax('4A', 'CADAVID', 'HELENA'),
     pax('4E', 'DAVALOS', 'IGNACIO', 'GOLD', ['GFML']),
     pax('5D', 'ESCOBAR', 'JANETH'),
@@ -326,7 +345,7 @@ export const FLIGHT_AV120: FlightManifest = {
   infantCount: 2,
   passengers: [
     // Business Class
-    pax('1A', 'LLINÁS', 'GUSTAVO', 'DIAM'),
+    pax('1A', 'LLINÁS', 'GUSTAVO', 'MAGN'),
     pax('1D', 'BARRIOS', 'MARINA', 'DIAM'),
     pax('1E', 'CAMPO', 'DAVID', 'GOLD'),
     pax('1K', 'DIAZ', 'CONSUELO'),
