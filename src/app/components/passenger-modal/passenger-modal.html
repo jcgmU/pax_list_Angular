@@ -1,103 +1,183 @@
 @if (selectedSeat() && manifest()) {
   <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <!-- Backdrop Blur Overlay -->
     <div
-      class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+      class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-250"
       (click)="close()"
     ></div>
 
-    <div class="relative w-full max-w-lg bg-white rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-      <!-- Header -->
-      <div class="p-6 bg-[#E20613] flex justify-between items-center text-white">
+    <!-- Modal Box -->
+    <div class="relative w-full max-w-lg bg-white rounded-[32px] shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[85vh] animate-modal-entry">
+      <!-- Header with Gradient -->
+      <div class="p-6 bg-gradient-to-r from-[#E20613] to-[#ff4d5a] flex justify-between items-center text-white shrink-0 shadow-md">
         <div class="flex items-center gap-3">
-          <div class="p-2 bg-white/20 rounded-xl">
-            <lucide-icon [name]="User" [size]="24"></lucide-icon>
+          <div class="p-2.5 bg-white/10 rounded-xl border border-white/10">
+            <lucide-icon [name]="User" [size]="20" class="text-white"></lucide-icon>
           </div>
           <div>
-            <h3 class="text-xl font-bold">{{ selectedSeat() }}</h3>
-            <p class="text-[10px] text-white/70 font-bold uppercase tracking-widest">
-              {{ showComanda() ? 'Pasajero · Business' : 'Detalles del Pasajero' }}
+            <h3 class="text-lg font-black tracking-tight flex items-center gap-2">
+              Asiento {{ selectedSeat() }}
+              @if (passenger() && (passenger()!.status === 'MAGN' || passenger()!.status === 'M')) {
+                <span class="text-[8px] bg-gradient-to-r from-[#3c1053] to-[#ad5389] border border-purple-300/20 text-white font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider animate-glow-purple">Magno Elite</span>
+              }
+              @if (passenger() && (passenger()!.status === 'DIAM' || passenger()!.status === 'D')) {
+                <span class="text-[8px] bg-slate-900/80 border border-white/20 text-white font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider">Diamond Elite</span>
+              }
+              @if (passenger() && (passenger()!.status === 'GOLD' || passenger()!.status === 'G')) {
+                <span class="text-[8px] bg-amber-400 text-amber-950 font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider">Gold Elite</span>
+              }
+            </h3>
+            <p class="text-[9px] text-white/80 font-bold uppercase tracking-widest leading-none mt-1">
+              {{ showComanda() ? 'Servicio Business Class' : 'Detalles del Pasajero' }}
             </p>
           </div>
         </div>
-        <button (click)="close()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
-          <lucide-icon [name]="X" [size]="20"></lucide-icon>
+        <button (click)="close()" class="p-2 hover:bg-white/15 rounded-full transition-colors cursor-pointer" aria-label="Cerrar">
+          <lucide-icon [name]="X" [size]="18"></lucide-icon>
         </button>
       </div>
 
-      <!-- Body -->
-      <div class="p-8 space-y-8 max-h-[75vh] overflow-y-auto scrollbar-hide">
+      <!-- Body Scrollable -->
+      <div class="p-6 space-y-6 overflow-y-auto scrollbar-hide flex-1">
         @if (!passenger()) {
-          <div class="flex flex-col items-center justify-center py-12 text-center space-y-4">
-            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-200">
-              <lucide-icon [name]="Info" [size]="32"></lucide-icon>
+          <div class="flex flex-col items-center justify-center py-16 text-center space-y-4">
+            <div class="w-16 h-16 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center text-slate-300">
+              <lucide-icon [name]="Info" [size]="28"></lucide-icon>
             </div>
-            <p class="text-slate-400 font-medium">Este asiento está vacío</p>
+            <div>
+              <p class="text-slate-700 font-extrabold text-sm">Asiento Libre</p>
+              <p class="text-slate-400 text-xs mt-1">No hay ningún pasajero asignado a este asiento.</p>
+            </div>
           </div>
         } @else {
-          <!-- Nombre -->
-          <section>
-            <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-2">
-              Pasajero
+          <!-- Pasajero Nombre -->
+          <section class="space-y-1">
+            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">
+              Nombre Completo
             </label>
-            <div class="text-3xl font-black text-slate-900 leading-tight">
-              {{ passenger()!.lastName }}, <span class="text-[#E20613]">{{ passenger()!.firstName }}</span>
+            <div class="text-2xl font-black text-slate-900 leading-tight">
+              {{ passenger()!.lastName }}, <span class="text-[#E20613] font-extrabold">{{ passenger()!.firstName }}</span>
             </div>
           </section>
 
-          <!-- Estatus LifeMiles -->
-          <section class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-            <div class="flex items-center gap-2 mb-3">
-              <lucide-icon [name]="Star" [size]="14" class="text-amber-500 fill-amber-500"></lucide-icon>
-              <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                Estatus LifeMiles
+          <!-- NPS Alert Banner (Service Recovery) -->
+          @if (passenger()!.nps) {
+            <section class="rounded-2xl p-4 border transition-all duration-300 shadow-sm animate-in slide-in-from-top-2" 
+                     [ngClass]="passenger()!.nps!.recovered ? 'bg-emerald-50/50 border-emerald-200/60' : 'bg-rose-50/50 border-rose-200/60 animate-glow-rose'">
+              <div class="flex gap-3">
+                <div class="mt-0.5 shrink-0" [ngClass]="passenger()!.nps!.recovered ? 'text-emerald-600' : 'text-rose-600'">
+                  @if (passenger()!.nps!.recovered) {
+                    <lucide-icon [name]="CheckCircle2" [size]="20"></lucide-icon>
+                  } @else {
+                    <lucide-icon [name]="AlertTriangle" [size]="20" class="animate-pulse"></lucide-icon>
+                  }
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-xs font-black uppercase tracking-wider" [ngClass]="passenger()!.nps!.recovered ? 'text-emerald-800' : 'text-rose-800'">
+                    @if (passenger()!.nps!.recovered) {
+                      Compensación Entregada
+                    } @else {
+                      Alerta NPS: Recuperación Activa (Score: {{ passenger()!.nps!.score }})
+                    }
+                  </h4>
+                  <p class="text-xs mt-1 text-slate-600 leading-relaxed italic">
+                    "{{ passenger()!.nps!.comment }}"
+                  </p>
+                  
+                  @if (!passenger()!.nps!.recovered) {
+                    <button 
+                      (click)="markNpsRecovered()"
+                      class="mt-3 w-full py-2 bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm hover:shadow active:scale-95"
+                    >
+                      Registrar Atención Ofrecida
+                    </button>
+                  }
+                </div>
+              </div>
+            </section>
+          }
+
+          <!-- Estatus LifeMiles Loyalty Card design -->
+          <section class="border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm">
+            <div class="px-4 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+              <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                <lucide-icon [name]="Star" [size]="10" class="text-slate-400"></lucide-icon>
+                Fidelización LifeMiles
               </span>
             </div>
-            @if (passenger()!.status) {
-              <div class="flex items-center gap-3">
-                <div
-                  class="px-3 py-1 rounded-full text-xs font-black uppercase"
-                  [ngClass]="getPassengerStatusColor()"
-                >
-                  {{ passenger()!.status }}
+            
+            <div class="p-4">
+              @if (passenger()!.status === 'MAGN' || passenger()!.status === 'M') {
+                <div class="bg-gradient-to-r from-[#3c1053] to-[#ad5389] rounded-xl p-3.5 text-white flex items-center justify-between border border-purple-950 relative overflow-hidden shadow-md animate-glow-purple">
+                  <div class="absolute right-[-15px] top-[-15px] opacity-10 pointer-events-none">
+                    <lucide-icon [name]="Crown" [size]="80"></lucide-icon>
+                  </div>
+                  <div>
+                    <p class="text-[9px] font-black uppercase tracking-widest text-purple-200">Estatus Magno</p>
+                    <p class="text-sm font-black mt-1 leading-none">Magno Elite</p>
+                  </div>
+                  <lucide-icon [name]="Crown" [size]="20" class="text-white fill-white shrink-0 shadow-sm"></lucide-icon>
                 </div>
-                <span class="text-sm font-bold text-slate-700">
-                  {{ getCodeDescription(passenger()!.status!) }}
-                </span>
-              </div>
-            } @else {
-              <span class="text-sm text-slate-400 italic">Sin estatus frecuente</span>
-            }
+              } @else if (passenger()!.status === 'DIAM' || passenger()!.status === 'D') {
+                <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl p-3.5 text-white flex items-center justify-between border border-slate-950 relative overflow-hidden shadow-md">
+                  <div class="absolute right-[-15px] top-[-15px] opacity-10 pointer-events-none">
+                    <lucide-icon [name]="Diamond" [size]="80"></lucide-icon>
+                  </div>
+                  <div>
+                    <p class="text-[9px] font-black uppercase tracking-widest text-slate-400">Estatus Diamante</p>
+                    <p class="text-sm font-black mt-1 leading-none">Diamond Elite</p>
+                  </div>
+                  <lucide-icon [name]="Diamond" [size]="20" class="text-amber-400 fill-amber-400 shrink-0 shadow-sm"></lucide-icon>
+                </div>
+              } @else if (passenger()!.status === 'GOLD' || passenger()!.status === 'G') {
+                <div class="bg-gradient-to-r from-amber-400 to-amber-500 rounded-xl p-3.5 text-amber-950 flex items-center justify-between border border-amber-500/30 relative overflow-hidden shadow-md">
+                  <div class="absolute right-[-15px] top-[-15px] opacity-15 pointer-events-none">
+                    <lucide-icon [name]="Star" [size]="80"></lucide-icon>
+                  </div>
+                  <div>
+                    <p class="text-[9px] font-black uppercase tracking-widest text-amber-900/70">Estatus Oro</p>
+                    <p class="text-sm font-black mt-1 leading-none">Gold Elite</p>
+                  </div>
+                  <lucide-icon [name]="Star" [size]="20" class="text-amber-950 fill-amber-950 shrink-0"></lucide-icon>
+                </div>
+              } @else {
+                <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
+                  <span class="text-xs text-slate-500 font-medium">Pasajero Clásico</span>
+                  <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sin Estatus VIP</span>
+                </div>
+              }
+            </div>
           </section>
 
-          <!-- SSR / Requerimientos -->
-          <section class="space-y-4">
-            <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block">
-              Requerimientos Especiales
+          <!-- SSR Special Requirements -->
+          <section class="space-y-3">
+            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">
+              Requerimientos Especiales (SSR)
             </label>
             @if (passenger()!.codes.length > 0) {
-              <div class="grid gap-3">
+              <div class="grid grid-cols-1 gap-2.5">
                 @for (code of passenger()!.codes; track code) {
-                  <div class="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-[#E20613]/20 transition-colors">
-                    <div class="p-2.5 rounded-xl" [ngClass]="getIconInfo(code).iconColor">
-                      <lucide-icon [name]="getIconInfo(code).Icon" [size]="20"></lucide-icon>
+                  <div class="flex items-center gap-3.5 p-3.5 bg-white border border-slate-200/60 rounded-2xl shadow-sm hover:border-[#E20613]/25 transition-all">
+                    <div class="p-2.5 rounded-xl shrink-0" [ngClass]="getIconInfo(code).iconColor">
+                      <lucide-icon [name]="getIconInfo(code).Icon" [size]="16" class="block"></lucide-icon>
                     </div>
-                    <div>
-                      <div class="text-xs font-black text-slate-900">{{ code }}</div>
-                      <div class="text-[10px] text-slate-500 font-medium">{{ getCodeDescription(code) }}</div>
+                    <div class="min-w-0 flex-1">
+                      <div class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ code }}</div>
+                      <div class="text-[10px] text-slate-500 mt-0.5 truncate leading-none font-medium">{{ getCodeDescription(code) }}</div>
                     </div>
                   </div>
                 }
               </div>
             } @else {
-              <div class="p-6 bg-slate-50 rounded-2xl text-center">
+              <div class="p-6 bg-slate-50/50 border border-slate-200/40 border-dashed rounded-2xl text-center">
                 <p class="text-xs text-slate-400 italic">
-                  No hay servicios especiales registrados
+                  Ningún requerimiento especial registrado
                 </p>
               </div>
             }
           </section>
 
-          <!-- Comanda de comida (solo business) -->
+          <!-- Comanda Food Form (Business Only) -->
           @if (showComanda()) {
             <div class="border-t border-slate-100 pt-6">
               <app-comanda-form [passenger]="passenger()!"></app-comanda-form>
@@ -107,9 +187,9 @@
       </div>
 
       <!-- Footer -->
-      <div class="p-4 bg-slate-50 text-center border-t border-slate-100">
-        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">
-          Información Confidencial • Solo para uso operativo
+      <div class="p-4 bg-slate-50 text-center border-t border-slate-100 shrink-0">
+        <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest">
+          Información Confidencial • Solo para Uso Operativo de Avianca
         </p>
       </div>
     </div>

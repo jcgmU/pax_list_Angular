@@ -4,7 +4,7 @@ import { StoreService } from '../../store.service';
 import { FLIGHT_CODES } from '../../../domain/flightCodes';
 import { getCabinClass } from '../../../domain/cabinLookup';
 import { ComandaForm } from '../comanda-form/comanda-form';
-import { LucideAngularModule, X, User, Star, Utensils, Accessibility, AlertCircle, Info } from 'lucide-angular';
+import { LucideAngularModule, X, User, Star, Utensils, Accessibility, AlertCircle, Info, AlertTriangle, CheckCircle2, Dog, Gift, Baby, Battery, Briefcase, Diamond, Crown } from 'lucide-angular';
 import { ParsedPassenger } from '../../../infrastructure/mockData';
 
 @Component({
@@ -23,6 +23,15 @@ export class PassengerModal {
   readonly Accessibility = Accessibility;
   readonly AlertCircle = AlertCircle;
   readonly Info = Info;
+  readonly AlertTriangle = AlertTriangle;
+  readonly CheckCircle2 = CheckCircle2;
+  readonly Dog = Dog;
+  readonly Gift = Gift;
+  readonly Baby = Baby;
+  readonly Battery = Battery;
+  readonly Briefcase = Briefcase;
+  readonly Diamond = Diamond;
+  readonly Crown = Crown;
 
   selectedSeat = this.store.selectedSeat;
   manifest = this.store.manifest;
@@ -52,8 +61,18 @@ export class PassengerModal {
     this.store.setSelectedSeat(null);
   }
 
+  markNpsRecovered() {
+    const seat = this.selectedSeat();
+    if (seat) {
+      this.store.recoverNps(seat);
+    }
+  }
+
   getPassengerStatusColor() {
     const status = this.passenger()?.status;
+    if (status === 'MAGN' || status === 'M') {
+      return 'bg-gradient-to-r from-[#3c1053] to-[#ad5389] text-white animate-glow-purple';
+    }
     if (status === 'DIAM' || status === 'D') {
       return 'bg-slate-900 text-white';
     }
@@ -67,6 +86,9 @@ export class PassengerModal {
     if (['WCHR', 'WCHS', 'WCHC', 'WCMP', 'WCOB'].includes(code)) {
       Icon = this.Accessibility;
       iconColor = 'bg-blue-100 text-blue-600';
+    } else if (Object.keys(FLIGHT_CODES.ANIMALS).includes(code)) {
+      Icon = this.Dog;
+      iconColor = 'bg-orange-100 text-orange-600';
     } else if (Object.keys(FLIGHT_CODES.MEALS).includes(code)) {
       Icon = this.Utensils;
       iconColor = 'bg-green-100 text-green-600';
@@ -76,6 +98,18 @@ export class PassengerModal {
     ) {
       Icon = this.AlertCircle;
       iconColor = 'bg-rose-100 text-rose-600';
+    } else if (Object.keys(FLIGHT_CODES.BATTERIES).includes(code)) {
+      Icon = this.Battery;
+      iconColor = 'bg-yellow-100 text-yellow-700';
+    } else if (Object.keys(FLIGHT_CODES.ASSISTANCE).includes(code)) {
+      Icon = this.Briefcase;
+      iconColor = 'bg-indigo-100 text-indigo-600';
+    } else if (code === 'BDAY') {
+      Icon = this.Gift;
+      iconColor = 'bg-pink-100 text-pink-600';
+    } else if (code === 'INF' || code === 'CHD') {
+      Icon = this.Baby;
+      iconColor = 'bg-cyan-100 text-cyan-600';
     }
 
     return { Icon, iconColor };

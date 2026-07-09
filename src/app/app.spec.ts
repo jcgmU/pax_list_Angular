@@ -3,6 +3,7 @@ import { App } from './app';
 import { StoreService } from './store.service';
 import { FLIGHT_CODES } from '../domain/flightCodes';
 import { countSSR } from '../domain/flightStats';
+import { Crown } from 'lucide-angular';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -259,6 +260,60 @@ describe('App', () => {
       // Verify Crown icon badge is rendered in the top right of the seat button
       const crownIcon = seatButton.querySelector('lucide-angular[strokeWidth="3"]');
       expect(crownIcon).toBeTruthy();
+    });
+
+    it('should display Magno details and card in the Passenger Modal when seat is selected', async () => {
+      const fixture = TestBed.createComponent(App);
+      const store = TestBed.inject(StoreService);
+      await fixture.whenStable();
+
+      store.setManifest({
+        flightNumber: 'AV210',
+        date: '03 JUN 2026',
+        aircraftType: 'A320',
+        origin: 'BOG',
+        destination: 'JFK',
+        departureTime: '07:20',
+        serviceType: 'AMERICAS',
+        infantCount: 0,
+        passengers: [
+          {
+            seat: '1A',
+            firstName: 'CARLOS',
+            lastName: 'RAMIREZ',
+            status: 'MAGN',
+            codes: ['MAGN'],
+            rawText: '1A RAMIREZ/CARLOS'
+          }
+        ]
+      });
+      fixture.detectChanges();
+
+      // Select seat 1A to open the modal
+      store.setSelectedSeat('1A');
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+      const modal = compiled.querySelector('app-passenger-modal');
+      expect(modal).toBeTruthy();
+
+      // Check header badge
+      const headerBadge = modal?.querySelector('span.animate-glow-purple');
+      expect(headerBadge).toBeTruthy();
+      expect(headerBadge?.textContent).toContain('Magno Elite');
+
+      // Check loyalty card section
+      const loyaltyCard = modal?.querySelector('.border-purple-950');
+      expect(loyaltyCard).toBeTruthy();
+      expect(loyaltyCard?.textContent).toContain('Estatus Magno');
+      expect(loyaltyCard?.textContent).toContain('Magno Elite');
+
+      // Verify Crown icon in the loyalty card
+      const crownIcons = loyaltyCard?.querySelectorAll('lucide-icon');
+      const hasCrownIcon = Array.from(crownIcons || []).some(icon => {
+        return icon.innerHTML.includes('M11.562 3.266');
+      });
+      expect(hasCrownIcon).toBe(true);
     });
   });
 });
