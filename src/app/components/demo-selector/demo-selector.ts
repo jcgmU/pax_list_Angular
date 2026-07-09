@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Plane, ArrowRight, Users, Clock, ChefHat } from 'lucide-angular';
+import { LucideAngularModule, ArrowRight, Users, Clock, ChefHat } from 'lucide-angular';
 import { StoreService } from '../../store.service';
 import { DEMO_FLIGHTS } from '../../../infrastructure/mockData';
 import { deriveMealSlots } from '../../../domain/mealService';
@@ -34,7 +34,6 @@ const ROUTE_COLORS = [
 export class DemoSelector {
   store = inject(StoreService);
 
-  readonly Plane = Plane;
   readonly ArrowRight = ArrowRight;
   readonly Users = Users;
   readonly Clock = Clock;

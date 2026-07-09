@@ -1,108 +1,128 @@
-<div class="flex flex-col items-center justify-center w-full max-w-4xl mx-auto px-4 py-8 gap-10">
+<div class="flex flex-col items-center justify-center w-full max-w-5xl mx-auto px-4 py-12 gap-12">
   <!-- Header -->
-  <div class="text-center space-y-2">
-    <div class="flex items-center justify-center gap-3 mb-4">
-      <div class="bg-[#E20613] p-3 rounded-2xl text-white shadow-lg">
-        <lucide-angular [img]="Plane" size="28"></lucide-angular>
+  <div class="text-center space-y-3">
+    <div class="flex items-center justify-center gap-3 mb-2">
+      <div class="bg-white border border-slate-200/80 p-2 rounded-2xl shadow-md flex items-center justify-center w-12 h-12">
+        <img src="avianca-symbol.png" alt="Avianca Logo" class="h-8 w-8 object-contain">
       </div>
-      <h1 class="text-4xl font-black text-slate-900 italic tracking-tight">
-        Avianca <span class="text-[#E20613] not-italic">SeatMap Pro</span>
+      <h1 class="flex items-center gap-2 text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        <img src="avianca-wordmark.png" alt="Avianca" class="h-8 sm:h-9 w-auto object-contain">
+        <span class="text-[#E20613] font-medium lowercase tracking-normal">SeatMap Pro</span>
       </h1>
     </div>
     <p class="text-slate-500 text-sm font-medium max-w-md mx-auto">
-      Selecciona un vuelo para gestionar el mapa de asientos y tomar la comanda de la cabina Business.
+      Panel operativo de tripulación de cabina. Seleccione un vuelo activo para comenzar la gestión de cabina y comandas.
     </p>
   </div>
 
-  <!-- Flight Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
+  <!-- Flight Cards Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
     @for (flight of flights; track flight.flightNumber) {
       <div
-        [ngClass]="[flight.colors.bg, flight.colors.border]"
-        class="border rounded-3xl p-6 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow"
+        (click)="onFlightSelect(flight)"
+        [style.--i]="$index"
+        class="group relative bg-white border border-slate-100 rounded-[28px] p-6 flex flex-col gap-5 shadow-sm hover:shadow-xl hover:shadow-red-500/5 hover:border-red-200/50 hover:-translate-y-1 transition-all duration-300 cursor-pointer ticket-cut overflow-hidden animate-stagger-item"
       >
+        <!-- Top color accent stripe based on flight type -->
+        <div class="absolute top-0 left-0 right-0 h-1.5"
+             [ngClass]="flight.serviceType === 'INSIGNIA' ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-gradient-to-r from-blue-500 to-sky-500'">
+        </div>
+
         <!-- Top row: número de vuelo + fecha -->
-        <div class="flex items-center justify-between">
-          <span [ngClass]="flight.colors.flightBadge" class="text-xs font-black px-3 py-1 rounded-full tracking-wider">
+        <div class="flex items-center justify-between mt-1">
+          <span [ngClass]="flight.colors.flightBadge" class="text-[10px] font-black px-2.5 py-1 rounded-lg tracking-wider">
             {{ flight.flightNumber }}
           </span>
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
             {{ flight.date }}
           </span>
         </div>
 
-        <!-- Ruta -->
-        <div class="flex items-center gap-3">
-          <div class="text-center">
-            <p class="text-2xl font-black text-slate-900">{{ flight.origin }}</p>
-            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Origen</p>
+        <!-- Route Section -->
+        <div class="flex items-center gap-3 py-2">
+          <div class="text-left">
+            <p class="text-2xl font-black text-slate-900 tracking-tighter">{{ flight.origin }}</p>
+            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Origen</p>
           </div>
-          <div class="flex-1 flex items-center justify-center">
-            <div class="flex-1 h-px bg-slate-300"></div>
-            <lucide-angular [img]="Plane" size="14" class="text-slate-400 mx-1 rotate-90 shrink-0"></lucide-angular>
-            <div class="flex-1 h-px bg-slate-300"></div>
+          
+          <div class="flex-1 flex items-center justify-center relative">
+            <div class="w-full h-[1px] border-t border-dashed border-slate-200"></div>
+            <div class="absolute bg-white px-2">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                stroke-width="2" 
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                class="h-3.5 w-3.5 text-[#E20613] rotate-90 shrink-0 block transition-all duration-500 group-hover:translate-x-3"
+              >
+                <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3.5c-.5-.5-2.5 0-4 1.5L13.5 8.5 5.3 6.7c-.9-.2-1.8.1-2.3.7-.5.5-.6 1.4-.4 2.3l2.8 5.7-2.7 2.7c-.4.4-.4 1 0 1.4.2.2.5.3.7.3.2 0 .5-.1.7-.3l2.7-2.7 5.7 2.8c.9.2 1.8.1 2.3-.4.5-.5.8-1.4.7-2.3z"/>
+              </svg>
+            </div>
           </div>
-          <div class="text-center">
-            <p class="text-2xl font-black text-slate-900">{{ flight.destination }}</p>
-            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Destino</p>
+
+          <div class="text-right">
+            <p class="text-2xl font-black text-slate-900 tracking-tighter">{{ flight.destination }}</p>
+            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Destino</p>
           </div>
         </div>
 
+        <!-- Middle Ticket Divider (Dotted Line) -->
+        <div class="w-full h-px border-t border-dashed border-slate-200 my-1 relative"></div>
+
         <!-- Hora + avión -->
         <div class="flex items-center justify-between text-slate-500">
-          <div class="flex items-center gap-1.5">
-            <lucide-angular [img]="Clock" size="12" class="shrink-0"></lucide-angular>
-            <span class="text-xs font-black">{{ flight.departureTime }}</span>
+          <div class="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-lg">
+            <lucide-angular [img]="Clock" size="11" class="shrink-0 text-slate-400"></lucide-angular>
+            <span class="text-[10px] font-black text-slate-700">{{ flight.departureTime }}</span>
           </div>
-          <span class="text-[10px] font-bold">
+          <span class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">
             {{ flight.aircraftLabel }}
           </span>
         </div>
 
         <!-- Servicio + comidas -->
-        <div class="border rounded-2xl p-3 space-y-2 bg-white/60">
+        <div class="border border-slate-100 rounded-2xl p-3.5 space-y-2.5 bg-slate-50/50">
           <div class="flex items-center gap-1.5">
-            <lucide-angular [img]="ChefHat" size="12" class="text-slate-500"></lucide-angular>
-            <span [ngClass]="flight.colors.serviceBadge" class="text-[10px] font-black px-2 py-0.5 rounded-full border">
+            <lucide-angular [img]="ChefHat" size="12" class="text-slate-400"></lucide-angular>
+            <span [ngClass]="flight.colors.serviceBadge" class="text-[9px] font-black px-2 py-0.5 rounded-md border tracking-wide uppercase">
               {{ flight.serviceLabel }}
             </span>
           </div>
           <div class="flex flex-wrap gap-1">
             @for (slot of flight.slots; track slot) {
-              <span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+              <span class="text-[9px] font-bold text-slate-600 bg-white border border-slate-200/50 px-2 py-0.5 rounded-full">
                 {{ getSlotLabel(slot) }}
               </span>
             }
           </div>
         </div>
 
-        <!-- Stats -->
-        <div class="flex items-center gap-3 bg-white/70 rounded-2xl p-3 border border-white">
-          <div class="flex items-center gap-1.5">
-            <lucide-angular [img]="Users" size="13" class="text-slate-500"></lucide-angular>
-            <span class="text-xs font-black text-slate-700">{{ flight.passengers.length }} pax</span>
+        <!-- Stats and CTA -->
+        <div class="flex items-center justify-between mt-2">
+          <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
+              <lucide-angular [img]="Users" size="11" class="text-slate-400"></lucide-angular>
+              <span class="text-[10px] font-black text-slate-700">{{ flight.passengers.length }} pax</span>
+            </div>
+            @if (flight.infantCount > 0) {
+              <span class="text-[10px] font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-1 rounded-lg">
+                +{{ flight.infantCount }} INF
+              </span>
+            }
           </div>
-          @if (flight.infantCount > 0) {
-            <span class="text-xs font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full">
-              +{{ flight.infantCount }} INF
-            </span>
-          }
+          
+          <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-[#E20613] transition-colors duration-300">
+            <lucide-angular [img]="ArrowRight" size="14"></lucide-angular>
+          </div>
         </div>
-
-        <!-- CTA -->
-        <button
-          (click)="onFlightSelect(flight)"
-          [ngClass]="flight.colors.btn"
-          class="text-white font-black text-sm py-3 rounded-2xl flex items-center justify-center gap-2 transition-colors active:scale-95"
-        >
-          Cargar vuelo
-          <lucide-angular [img]="ArrowRight" size="16"></lucide-angular>
-        </button>
       </div>
     }
   </div>
 
-  <p class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">
-    Modo Demo · Datos ficticios para presentación
+  <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-4">
+    Modo Demo · Avianca SeatMap Pro 1.0.0 · iPad Ready
   </p>
 </div>

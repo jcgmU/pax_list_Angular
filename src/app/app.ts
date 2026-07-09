@@ -9,7 +9,7 @@ import { StatsSidebar } from './components/stats-sidebar/stats-sidebar';
 import { PassengerModal } from './components/passenger-modal/passenger-modal';
 import { ComandaMode } from './components/comanda-mode/comanda-mode';
 
-import { LucideAngularModule, Plane, RotateCcw, FlaskConical, ChevronDown, ChefHat } from 'lucide-angular';
+import { LucideAngularModule, RotateCcw, FlaskConical, ChevronDown, ChefHat } from 'lucide-angular';
 
 @Component({
   selector: 'app-root',
@@ -28,7 +28,6 @@ import { LucideAngularModule, Plane, RotateCcw, FlaskConical, ChevronDown, ChefH
 export class App {
   store = inject(StoreService);
   
-  readonly Plane = Plane;
   readonly RotateCcw = RotateCcw;
   readonly FlaskConical = FlaskConical;
   readonly ChevronDown = ChevronDown;
