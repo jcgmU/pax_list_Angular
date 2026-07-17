@@ -1,0 +1,53 @@
+# Resumen Actual y Roadmap Técnico: Pax List App
+
+## 1. Lo que tenemos hoy (El Punto de Partida)
+- **Frontend Moderno y Reactivo:** Una aplicación construida en **Angular** (usando *Signals* y la nueva sintaxis de plantillas), altamente optimizada y con un diseño premium gracias a **Tailwind CSS**.
+- **Lógica de Negocio Aislada:** Arquitectura limpia donde el dominio (mapas de asientos, contadores, zonas de tripulación) está separado de la interfaz gráfica.
+- **Estado Local:** Manejo centralizado del estado a través de un `StoreService` (Single Source of Truth).
+- **Limitación Actual:** Funciona exclusivamente con datos simulados (Mocks). No hay persistencia de datos real ni conexión con sistemas externos.
+
+## 2. La Arquitectura Propuesta
+- **Plataforma:** Convertir la app Angular en una **App Nativa para iPad usando Capacitor**.
+- **Flujo Offline-First:** Base de datos local robusta (SQLite + RxDB/WatermelonDB) en el dispositivo. La app lee y escribe en local; nunca espera a la red.
+- **Sincronización P2P (En Vuelo):** Uso de **Multipeer Connectivity** de Apple (Bluetooth / Wi-Fi P2P) para que los iPads de la tripulación compartan información en el aire sin router ni internet.
+- **Backend Middleware (En Tierra):** Un servidor central (ej. NestJS o un servicio Cloud) que actúe como puente entre los sistemas legacy de la aerolínea y nuestra App, sincronizando los datos (Manifiestos hacia el iPad, Comandas hacia la nube) cuando hay internet.
+
+---
+
+## 3. Preguntas Clave para el Equipo (Estructuración del Backend)
+
+### Sobre las Fuentes de Información (Sistemas Legacy)
+
+**1. ¿Qué sistemas actualmente nos proveen el Manifiesto Final (DCS), los requerimientos especiales (SSR) y los perfiles de lealtad?**
+*   **Por qué es valiosa:** Las aerolíneas tienen múltiples proveedores (Amadeus, Sabre, sistemas in-house). Necesitamos saber exactamente con cuántos "idiomas" tendrá que hablar nuestro nuevo backend.
+*   **Objetivo:** Determinar la complejidad del Middleware. Si toda la info viene de un solo proveedor, es rápido; si hay que cruzar datos de 3 sistemas diferentes, el backend será más complejo y requerirá una capa de transformación de datos (ETL).
+
+**2. ¿Las APIs de estos sistemas legacy nos permiten hacer consultas masivas (Bulk/Batch) o tendremos restricciones de rate-limits (límites de peticiones)?**
+*   **Por qué es valiosa:** Si 50 iPads se conectan al mismo tiempo en tierra para descargar el manifiesto, podríamos tumbar un sistema viejo o incurrir en costos altísimos de facturación por API.
+*   **Objetivo:** Decidir si nuestro Backend necesita implementar una caché fuerte o bases de datos intermedias.
+
+### Sobre la Experiencia del Cliente (NPS) y Lealtad (NUEVAS PREGUNTAS)
+
+**3. ¿Tenemos una API consolidada para consultar el estatus de LifeMiles (Diamond/Gold) y el historial reciente de quejas/NPS de un pasajero en tiempo real?**
+*   **Por qué es valiosa:** Para la funcionalidad de "Recuperación de Servicio", necesitamos saber si un pasajero viene de un vuelo cancelado o tuvo un mal trato reciente antes de que aborde.
+*   **Objetivo:** Identificar si esta información viene atada al manifiesto (DCS) o si el backend tendrá que ir a buscarla específicamente al CRM de la aerolínea por cada pasajero.
+
+**4. Si la tripulación marca en la app que ya "ofreció atención/compensación" a un pasajero molesto, ¿a qué sistema se envía esa confirmación?**
+*   **Por qué es valiosa:** Necesitamos cerrar el ciclo de servicio al cliente. Esta acción no solo debe actualizar los iPads en vuelo, sino que debe viajar a tierra para que Atención al Cliente sepa que el problema se mitigó.
+*   **Objetivo:** Definir el "endpoint de salida" para los incidentes de NPS resueltos.
+
+### Sobre el Catering y Comandas
+
+**5. ¿Cómo se digitaliza actualmente el inventario real (lo que se cargó físicamente) de comida que sube al avión? ¿Hay una API para esto?**
+*   **Por qué es valiosa:** Necesitamos inyectar el inventario inicial a los iPads antes de despegar.
+*   **Objetivo:** Identificar si necesitamos crear un portal web básico para que catering introduzca manualmente estos datos, o si podemos consumirlos automáticamente.
+
+### Sobre el Hardware y Operativa (Conexión P2P)
+
+**6. ¿Existen restricciones de seguridad o políticas (MDM) en los iPads de la tripulación que bloqueen el uso de Bluetooth o conexiones P2P?**
+*   **Por qué es valiosa:** Si los iPads tienen bloqueado el Bluetooth/Wi-Fi directo por políticas corporativas, la sincronización en vuelo será imposible sin un router en el avión.
+*   **Objetivo:** Levantar riesgos operativos tempranos con el equipo de TI y redes.
+
+**7. ¿Cuál es la ventana de tiempo (en minutos) que tiene la tripulación conectada a internet antes de perder la señal?**
+*   **Por qué es valiosa:** Define cuánto peso de datos podemos descargar.
+*   **Objetivo:** Planear la estrategia de compresión y decidir si bajamos fotos e historiales completos o solo texto plano.

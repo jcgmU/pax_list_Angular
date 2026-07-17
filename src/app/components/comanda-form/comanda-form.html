@@ -4,42 +4,44 @@
       <!-- Header del servicio -->
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <lucide-icon [name]="ChefHat" [size]="16" class="text-[#E20613]"></lucide-icon>
-          <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest">
+          <lucide-icon [name]="ChefHat" [size]="14" class="text-[#E20613]"></lucide-icon>
+          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">
             Comanda de Servicio
           </label>
         </div>
-        <span class="text-[9px] font-black px-2 py-1 rounded-full border" [ngClass]="serviceInfo()!.color">
+        <span class="text-[8px] font-black px-2 py-0.5 rounded-md border uppercase tracking-wider" [ngClass]="serviceInfo()!.color">
           {{ serviceInfo()!.label }}
         </span>
       </div>
 
       <!-- Panel "no disponible" -->
-      <div class="flex flex-col items-center gap-4 py-8 px-4 bg-slate-50 border border-slate-200 rounded-2xl text-center">
-        <lucide-icon [name]="UserX" [size]="32" class="text-slate-400"></lucide-icon>
+      <div class="flex flex-col items-center gap-4 py-8 px-4 bg-slate-50 border border-slate-200/60 rounded-2xl text-center shadow-inner">
+        <div class="p-3 bg-slate-100 rounded-full text-slate-400">
+          <lucide-icon [name]="UserX" [size]="24"></lucide-icon>
+        </div>
         <div>
-          <p class="text-sm font-black text-slate-700">Pasajero no disponible</p>
-          <p class="text-xs text-slate-400 mt-1">Marcado como no disponible para la comanda</p>
+          <p class="text-xs font-black text-slate-700 uppercase tracking-wide">Pasajero no disponible</p>
+          <p class="text-[10px] text-slate-400 mt-1 font-medium">Marcado como no disponible para el servicio de comida.</p>
         </div>
         <button
           (click)="setPaxUnavailable(false)"
-          class="px-4 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-600 hover:border-slate-400 transition-all active:scale-95"
+          class="px-4 py-2 bg-white border border-slate-200 hover:border-slate-350 rounded-xl text-[10px] font-black uppercase tracking-wider text-slate-600 transition-all cursor-pointer shadow-sm active:scale-95"
         >
           Reactivar pasajero
         </button>
       </div>
     </section>
   } @else {
-    <section class="space-y-4 pt-2">
+    <section class="space-y-5 pt-2">
       <!-- Header del servicio -->
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <lucide-icon [name]="ChefHat" [size]="16" class="text-[#E20613]"></lucide-icon>
-          <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest">
+          <lucide-icon [name]="ChefHat" [size]="14" class="text-[#E20613]"></lucide-icon>
+          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">
             Comanda de Servicio
           </label>
         </div>
-        <span class="text-[9px] font-black px-2 py-1 rounded-full border" [ngClass]="serviceInfo()!.color">
+        <span class="text-[8px] font-black px-2 py-0.5 rounded-md border uppercase tracking-wider" [ngClass]="serviceInfo()!.color">
           {{ serviceInfo()!.label }}
         </span>
       </div>
@@ -47,67 +49,69 @@
       <!-- Tarjetas de servicio -->
       @for (course of courses(); track course.slot) {
         @if (hasSpecialMeal()) {
-          <div class="border border-amber-200 rounded-2xl overflow-hidden">
-            <div class="px-4 py-3 bg-amber-50 flex items-center justify-between">
+          <div class="border border-amber-200/50 rounded-2xl overflow-hidden shadow-sm bg-white">
+            <div class="px-4 py-3 bg-amber-50/50 flex items-center justify-between border-b border-amber-100/50">
               <div class="flex items-center gap-2">
-                <span class="text-base">{{ SLOT_ICONS[course.slot] }}</span>
-                <span class="text-sm font-black text-slate-800">{{ course.label }}</span>
+                <span class="text-sm">{{ SLOT_ICONS[course.slot] }}</span>
+                <span class="text-xs font-black text-slate-800 uppercase tracking-wide">{{ course.label }}</span>
               </div>
-              <lucide-icon [name]="CheckCircle2" [size]="16" class="text-amber-500"></lucide-icon>
+              <lucide-icon [name]="CheckCircle2" [size]="14" class="text-amber-500"></lucide-icon>
             </div>
-            <div class="p-4 space-y-3">
-              <div class="bg-amber-50 border border-amber-100 rounded-xl p-3">
-                <p class="text-[10px] font-black text-amber-700 uppercase tracking-wide mb-1.5">
+            <div class="p-4 space-y-3.5">
+              <div class="bg-amber-50/30 border border-amber-100/50 rounded-xl p-3.5 shadow-inner">
+                <p class="text-[8px] font-black text-amber-700 uppercase tracking-wider mb-1.5">
                   Comida especial pre-registrada
                 </p>
                 @for (code of ssrMeals(); track code) {
-                  <p class="text-xs text-amber-900 leading-relaxed">
-                    <span class="font-black">{{ code }}</span>
-                    —
+                  <p class="text-xs text-amber-900 leading-relaxed font-semibold">
+                    <span class="font-black bg-amber-100/80 px-1.5 py-0.5 rounded mr-1.5">{{ code }}</span>
                     {{ getMealDescription(code) }}
                   </p>
                 }
               </div>
               @if (course.hasWakeUp) {
+                <!-- Custom Switch Design for wakeUp toggle -->
                 <button
                   (click)="setCourseSelection(course.slot, { wakeUp: !(order()[course.slot]?.wakeUp) })"
-                  class="w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all"
-                  [ngClass]="order()[course.slot]?.wakeUp ? 'bg-slate-900 border-slate-900 text-white' : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'"
+                  class="w-full flex items-center justify-between px-4 py-3 rounded-2xl border transition-all bg-slate-50/50 hover:bg-slate-50 cursor-pointer border-slate-200/80"
                 >
-                  <span class="text-xs font-bold">¿Despertar para {{ course.label.toLowerCase() }}?</span>
-                  @if (order()[course.slot]?.wakeUp) {
-                    <lucide-icon [name]="Bell" [size]="16" class="text-amber-400"></lucide-icon>
-                  } @else {
-                    <lucide-icon [name]="BellOff" [size]="16"></lucide-icon>
-                  }
+                  <div class="flex items-center gap-2.5">
+                    <lucide-icon [name]="Bell" [size]="14" class="text-slate-400" [ngClass]="{'text-amber-500 fill-amber-400': order()[course.slot]?.wakeUp}"></lucide-icon>
+                    <span class="text-xs font-black text-slate-700">¿Despertar para el servicio?</span>
+                  </div>
+                  <div class="w-10 h-6 rounded-full p-0.5 transition-colors duration-250 cursor-pointer relative shrink-0"
+                       [ngClass]="order()[course.slot]?.wakeUp ? 'bg-emerald-500' : 'bg-slate-200'">
+                    <div class="w-5 h-5 rounded-full bg-white shadow transition-transform duration-250 transform"
+                         [ngClass]="order()[course.slot]?.wakeUp ? 'translate-x-4' : 'translate-x-0'"></div>
+                  </div>
                 </button>
               }
             </div>
           </div>
         } @else {
           <div
-            class="border rounded-2xl overflow-hidden transition-all"
-            [ngClass]="(order()[course.slot]?.platoFuerteId && (!course.hasEntrada || order()[course.slot]?.entradaId)) ? 'border-green-200 bg-green-50/30' : 'border-slate-200 bg-white'"
+            class="border rounded-2xl overflow-hidden transition-all bg-white"
+            [ngClass]="(order()[course.slot]?.platoFuerteId && (!course.hasEntrada || order()[course.slot]?.entradaId)) ? 'border-emerald-200 bg-emerald-50/5' : 'border-slate-200'"
           >
-            <div class="px-4 py-3 flex items-center justify-between"
-                 [ngClass]="(order()[course.slot]?.platoFuerteId && (!course.hasEntrada || order()[course.slot]?.entradaId)) ? 'bg-green-50' : 'bg-slate-50'">
+            <div class="px-4 py-3 flex items-center justify-between border-b"
+                 [ngClass]="(order()[course.slot]?.platoFuerteId && (!course.hasEntrada || order()[course.slot]?.entradaId)) ? 'bg-emerald-50/30 border-emerald-100/50' : 'bg-slate-50/60 border-slate-100'">
               <div class="flex items-center gap-2">
-                <span class="text-base">{{ SLOT_ICONS[course.slot] }}</span>
-                <span class="text-sm font-black text-slate-800">{{ course.label }}</span>
+                <span class="text-sm">{{ SLOT_ICONS[course.slot] }}</span>
+                <span class="text-xs font-black text-slate-800 uppercase tracking-wide">{{ course.label }}</span>
               </div>
               @if (order()[course.slot]?.platoFuerteId && (!course.hasEntrada || order()[course.slot]?.entradaId)) {
-                <lucide-icon [name]="CheckCircle2" [size]="16" class="text-green-500"></lucide-icon>
+                <lucide-icon [name]="CheckCircle2" [size]="14" class="text-emerald-500"></lucide-icon>
               } @else {
-                <lucide-icon [name]="UtensilsCrossed" [size]="14" class="text-slate-300"></lucide-icon>
+                <lucide-icon [name]="UtensilsCrossed" [size]="12" class="text-slate-300"></lucide-icon>
               }
             </div>
 
             <div class="p-4 space-y-4">
               @if (activeServiceType() === 'INSIGNIA') {
                 @if (course.hasEntrada) {
-                  <div>
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Entrada</label>
-                    <div class="space-y-2">
+                  <div class="space-y-2">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Entrada</label>
+                    <div class="space-y-1.5">
                       @for (item of course.entradas; track item.id) {
                         @let remaining = getRemainingForItem(course.slot, 'entrada', item.id, item.stock ?? 99);
                         @let selected = order()[course.slot]?.entradaId === item.id;
@@ -116,30 +120,35 @@
                         <button
                           (click)="!isAgotado && setCourseSelection(course.slot, { entradaId: item.id })"
                           [disabled]="isAgotado"
-                          class="w-full text-left p-3 rounded-xl border transition-all"
-                          [ngClass]="selected ? 'border-[#E20613] bg-red-50 ring-1 ring-[#E20613]/30' : isAgotado ? 'border-slate-100 bg-slate-50 opacity-50 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-slate-300 active:scale-[0.99]'"
+                          class="w-full text-left p-3 rounded-2xl border transition-all flex items-center gap-3 cursor-pointer select-none"
+                          [ngClass]="selected ? 'border-[#E20613] bg-red-50/50 shadow-sm shadow-red-500/5' : isAgotado ? 'border-slate-100 bg-slate-50/50 opacity-40 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-slate-350 hover:shadow-sm'"
                         >
-                          <div class="flex items-center justify-between gap-2">
-                            <div class="flex-1 min-w-0">
-                              <p class="text-xs font-bold truncate" [ngClass]="selected ? 'text-[#E20613]' : isAgotado ? 'text-slate-400' : 'text-slate-800'">
-                                {{ item.name }}
-                              </p>
-                              <p class="text-[10px] text-slate-400 truncate mt-0.5">{{ item.description }}</p>
-                            </div>
-                            <span class="text-[10px] font-black px-2 py-0.5 rounded-full shrink-0"
-                                  [ngClass]="selected ? 'bg-[#E20613] text-white' : isAgotado ? 'bg-slate-200 text-slate-400' : remaining <= 1 ? 'bg-red-100 text-red-700' : remaining <= 2 ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'">
-                              {{ isAgotado ? 'Agotado' : remaining + ' rest.' }}
-                            </span>
+                          <div class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors"
+                               [ngClass]="selected ? 'border-[#E20613] bg-[#E20613]' : 'border-slate-300 bg-white'">
+                            @if (selected) {
+                              <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                            }
                           </div>
+                          
+                          <div class="flex-1 min-w-0">
+                            <p class="text-xs font-black truncate" [ngClass]="selected ? 'text-[#E20613]' : isAgotado ? 'text-slate-400' : 'text-slate-800'">
+                              {{ item.name }}
+                            </p>
+                            <p class="text-[9px] text-slate-450 truncate mt-0.5 font-medium">{{ item.description }}</p>
+                          </div>
+                          <span class="text-[9px] font-black px-2 py-0.5 rounded-md shrink-0 uppercase tracking-wider border"
+                                [ngClass]="selected ? 'bg-[#E20613] border-[#E20613] text-white' : isAgotado ? 'bg-slate-150 border-slate-200 text-slate-400' : remaining <= 1 ? 'bg-red-50 border-red-200/50 text-red-700' : remaining <= 2 ? 'bg-amber-50 border-amber-200/50 text-amber-700' : 'bg-emerald-50 border-emerald-200/50 text-emerald-700'">
+                            {{ isAgotado ? 'Agotado' : remaining + ' rest.' }}
+                          </span>
                         </button>
                       }
                     </div>
                   </div>
                 }
 
-                <div>
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Plato fuerte</label>
-                  <div class="space-y-2">
+                <div class="space-y-2">
+                  <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Plato fuerte</label>
+                  <div class="space-y-1.5">
                     @for (item of course.platosFuertes; track item.id) {
                       @let remainingPlato = getRemainingForItem(course.slot, 'plato', item.id, item.stock ?? 99);
                       @let selectedPlato = order()[course.slot]?.platoFuerteId === item.id;
@@ -148,97 +157,117 @@
                       <button
                         (click)="!isAgotadoPlato && setCourseSelection(course.slot, { platoFuerteId: item.id })"
                         [disabled]="isAgotadoPlato"
-                        class="w-full text-left p-3 rounded-xl border transition-all"
-                        [ngClass]="selectedPlato ? 'border-[#E20613] bg-red-50 ring-1 ring-[#E20613]/30' : isAgotadoPlato ? 'border-slate-100 bg-slate-50 opacity-50 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-slate-300 active:scale-[0.99]'"
+                        class="w-full text-left p-3 rounded-2xl border transition-all flex items-center gap-3 cursor-pointer select-none"
+                        [ngClass]="selectedPlato ? 'border-[#E20613] bg-red-50/50 shadow-sm shadow-red-500/5' : isAgotadoPlato ? 'border-slate-100 bg-slate-50/50 opacity-40 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-slate-350 hover:shadow-sm'"
                       >
-                        <div class="flex items-center justify-between gap-2">
-                          <div class="flex-1 min-w-0">
-                            <p class="text-xs font-bold truncate" [ngClass]="selectedPlato ? 'text-[#E20613]' : isAgotadoPlato ? 'text-slate-400' : 'text-slate-800'">
-                              {{ item.name }}
-                            </p>
-                            <p class="text-[10px] text-slate-400 truncate mt-0.5">{{ item.description }}</p>
-                          </div>
-                          <span class="text-[10px] font-black px-2 py-0.5 rounded-full shrink-0"
-                                [ngClass]="selectedPlato ? 'bg-[#E20613] text-white' : isAgotadoPlato ? 'bg-slate-200 text-slate-400' : remainingPlato <= 1 ? 'bg-red-100 text-red-700' : remainingPlato <= 2 ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'">
-                            {{ isAgotadoPlato ? 'Agotado' : remainingPlato + ' rest.' }}
-                          </span>
+                        <div class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors"
+                             [ngClass]="selectedPlato ? 'border-[#E20613] bg-[#E20613]' : 'border-slate-300 bg-white'">
+                          @if (selectedPlato) {
+                            <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                          }
                         </div>
+                        
+                        <div class="flex-1 min-w-0">
+                          <p class="text-xs font-black truncate" [ngClass]="selectedPlato ? 'text-[#E20613]' : isAgotadoPlato ? 'text-slate-400' : 'text-slate-800'">
+                            {{ item.name }}
+                          </p>
+                          <p class="text-[9px] text-slate-450 truncate mt-0.5 font-medium">{{ item.description }}</p>
+                        </div>
+                        <span class="text-[9px] font-black px-2 py-0.5 rounded-md shrink-0 uppercase tracking-wider border"
+                              [ngClass]="selectedPlato ? 'bg-[#E20613] border-[#E20613] text-white' : isAgotadoPlato ? 'bg-slate-150 border-slate-200 text-slate-400' : remainingPlato <= 1 ? 'bg-red-50 border-red-200/50 text-red-700' : remainingPlato <= 2 ? 'bg-amber-50 border-amber-200/50 text-amber-700' : 'bg-emerald-50 border-emerald-200/50 text-emerald-700'">
+                          {{ isAgotadoPlato ? 'Agotado' : remainingPlato + ' rest.' }}
+                        </span>
                       </button>
                     }
                   </div>
                 </div>
 
+                <!-- Unmet desires (no stock options) -->
                 @if (getCoursePlatosAgostados(course).length > 0 || getCourseEntradasAgostadas(course).length > 0) {
-                  <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 space-y-2">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">¿Qué pidió pero no había?</p>
+                  <div class="border border-slate-200/60 rounded-2xl p-3.5 bg-slate-50/50 space-y-2.5 shadow-inner">
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <lucide-icon [name]="UserX" [size]="10" class="text-slate-400"></lucide-icon>
+                      Preferencia no disponible (Sin Stock)
+                    </p>
                     
                     @if (getCoursePlatosAgostados(course).length > 0) {
                       <div class="space-y-1">
-                        <p class="text-[10px] text-slate-400">Plato fuerte:</p>
-                        @for (item of getCoursePlatosAgostados(course); track item.id) {
-                          <button
-                            (click)="setCourseSelection(course.slot, { unmetPlatoId: order()[course.slot]?.unmetPlatoId === item.id ? undefined : item.id })"
-                            class="w-full text-left px-3 py-2 rounded-lg border text-xs font-medium transition-all"
-                            [ngClass]="order()[course.slot]?.unmetPlatoId === item.id ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'"
-                          >
-                            {{ item.name }}
-                          </button>
-                        }
+                        <p class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Plato fuerte solicitado:</p>
+                        <div class="flex flex-wrap gap-1.5">
+                          @for (item of getCoursePlatosAgostados(course); track item.id) {
+                            <button
+                              (click)="setCourseSelection(course.slot, { unmetPlatoId: order()[course.slot]?.unmetPlatoId === item.id ? undefined : item.id })"
+                              class="text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl border transition-all cursor-pointer"
+                              [ngClass]="order()[course.slot]?.unmetPlatoId === item.id ? 'bg-slate-900 border-slate-950 text-white' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'"
+                            >
+                              {{ item.name }}
+                            </button>
+                          }
+                        </div>
                       </div>
                     }
 
                     @if (getCourseEntradasAgostadas(course).length > 0) {
                       <div class="space-y-1">
-                        <p class="text-[10px] text-slate-400">Entrada:</p>
-                        @for (item of getCourseEntradasAgostadas(course); track item.id) {
-                          <button
-                            (click)="setCourseSelection(course.slot, { unmetEntradaId: order()[course.slot]?.unmetEntradaId === item.id ? undefined : item.id })"
-                            class="w-full text-left px-3 py-2 rounded-lg border text-xs font-medium transition-all"
-                            [ngClass]="order()[course.slot]?.unmetEntradaId === item.id ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'"
-                          >
-                            {{ item.name }}
-                          </button>
-                        }
+                        <p class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Entrada solicitada:</p>
+                        <div class="flex flex-wrap gap-1.5">
+                          @for (item of getCourseEntradasAgostadas(course); track item.id) {
+                            <button
+                              (click)="setCourseSelection(course.slot, { unmetEntradaId: order()[course.slot]?.unmetEntradaId === item.id ? undefined : item.id })"
+                              class="text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl border transition-all cursor-pointer"
+                              [ngClass]="order()[course.slot]?.unmetEntradaId === item.id ? 'bg-slate-900 border-slate-950 text-white' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'"
+                            >
+                              {{ item.name }}
+                            </button>
+                          }
+                        </div>
                       </div>
                     }
                   </div>
                 }
 
                 @if (course.hasWakeUp) {
+                  <!-- Custom Switch Design for wakeUp toggle -->
                   <button
                     (click)="setCourseSelection(course.slot, { wakeUp: !(order()[course.slot]?.wakeUp) })"
-                    class="w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all"
-                    [ngClass]="order()[course.slot]?.wakeUp ? 'bg-slate-900 border-slate-900 text-white' : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'"
+                    class="w-full flex items-center justify-between px-4 py-3 rounded-2xl border transition-all bg-slate-50/50 hover:bg-slate-50 cursor-pointer border-slate-200/80"
                   >
-                    <span class="text-xs font-bold">¿Despertar para {{ course.label.toLowerCase() }}?</span>
-                    @if (order()[course.slot]?.wakeUp) {
-                      <lucide-icon [name]="Bell" [size]="16" class="text-amber-400"></lucide-icon>
-                    } @else {
-                      <lucide-icon [name]="BellOff" [size]="16"></lucide-icon>
-                    }
+                    <div class="flex items-center gap-2.5">
+                      <lucide-icon [name]="Bell" [size]="14" class="text-slate-400" [ngClass]="{'text-amber-500 fill-amber-400': order()[course.slot]?.wakeUp}"></lucide-icon>
+                      <span class="text-xs font-black text-slate-700">¿Despertar para el servicio?</span>
+                    </div>
+                    <div class="w-10 h-6 rounded-full p-0.5 transition-colors duration-250 cursor-pointer relative shrink-0"
+                         [ngClass]="order()[course.slot]?.wakeUp ? 'bg-emerald-500' : 'bg-slate-200'">
+                      <div class="w-5 h-5 rounded-full bg-white shadow transition-transform duration-250 transform"
+                           [ngClass]="order()[course.slot]?.wakeUp ? 'translate-x-4' : 'translate-x-0'"></div>
+                    </div>
                   </button>
                 }
               } @else {
                 <div>
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">
+                  <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">
                     Plato fuerte
                   </label>
-                  <select
-                    [value]="order()[course.slot]?.platoFuerteId ?? ''"
-                    (change)="onSelectChange(course.slot, $event)"
-                    class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 font-medium focus:ring-2 focus:ring-[#E20613] focus:border-transparent outline-none transition-all appearance-none cursor-pointer"
-                  >
-                    <option value="">— Seleccionar plato —</option>
-                    @for (item of course.platosFuertes; track item.id) {
-                      <option [value]="item.id">
-                        {{ item.name }} ({{ getRemainingForItem(course.slot, 'plato', item.id, item.stock ?? 99) }} rest.)
-                      </option>
-                    }
-                  </select>
+                  <div class="relative flex items-center">
+                    <select
+                      [value]="order()[course.slot]?.platoFuerteId ?? ''"
+                      (change)="onSelectChange(course.slot, $event)"
+                      class="w-full pl-3 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-bold focus:ring-2 focus:ring-[#E20613]/25 outline-none transition-all appearance-none cursor-pointer"
+                    >
+                      <option value="">— Seleccionar plato —</option>
+                      @for (item of course.platosFuertes; track item.id) {
+                        <option [value]="item.id">
+                          {{ item.name }} ({{ getRemainingForItem(course.slot, 'plato', item.id, item.stock ?? 99) }} rest.)
+                        </option>
+                      }
+                    </select>
+                    <!-- Custom Arrow Icon -->
+                    <lucide-icon [name]="ChevronDown" [size]="12" class="absolute right-3 text-slate-400 pointer-events-none"></lucide-icon>
+                  </div>
                   @if (order()[course.slot]?.platoFuerteId) {
                     @for (item of course.platosFuertes; track item.id) {
                       @if (item.id === order()[course.slot]?.platoFuerteId) {
-                        <p class="text-[10px] text-slate-400 mt-1 pl-1">{{ item.description }}</p>
+                        <p class="text-[10px] text-slate-400 mt-1.5 pl-1 leading-relaxed">{{ item.description }}</p>
                       }
                     }
                   }
@@ -251,9 +280,9 @@
 
       <!-- Estado de la comanda — solo pax normal -->
       @if (!hasSpecialMeal() && isOrderComplete()) {
-        <div class="flex items-center gap-2 px-4 py-3 bg-green-50 border border-green-200 rounded-xl">
-          <lucide-icon [name]="CheckCircle2" [size]="14" class="text-green-600"></lucide-icon>
-          <p class="text-xs font-bold text-green-700">Comanda registrada</p>
+        <div class="flex items-center gap-2 px-4 py-3 bg-emerald-50 border border-emerald-200/50 rounded-xl animate-in fade-in duration-200">
+          <lucide-icon [name]="CheckCircle2" [size]="14" class="text-emerald-600"></lucide-icon>
+          <p class="text-xs font-black text-emerald-700 uppercase tracking-wider">Comanda registrada con éxito</p>
         </div>
       }
 
@@ -261,10 +290,10 @@
       @if (!hasSpecialMeal() && !isUnavailable()) {
         <button
           (click)="setPaxUnavailable(true)"
-          class="w-full flex items-center justify-center gap-2 px-4 py-3 mt-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-500 hover:border-slate-300 hover:text-slate-700 transition-all active:scale-95"
+          class="w-full flex items-center justify-center gap-2 px-4 py-3 mt-2 bg-white border border-slate-200 hover:border-slate-350 hover:bg-slate-50 text-xs font-black uppercase tracking-wider text-slate-500 hover:text-slate-700 transition-all cursor-pointer rounded-xl active:scale-95"
         >
-          <lucide-icon [name]="UserX" [size]="14"></lucide-icon>
-          Pax no disponible
+          <lucide-icon [name]="UserX" [size]="12"></lucide-icon>
+          Pasajero No Disponible / Dormido
         </button>
       }
     </section>

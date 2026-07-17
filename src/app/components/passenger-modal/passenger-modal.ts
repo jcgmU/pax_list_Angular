@@ -4,13 +4,14 @@ import { StoreService } from '../../store.service';
 import { FLIGHT_CODES } from '../../../domain/flightCodes';
 import { getCabinClass } from '../../../domain/cabinLookup';
 import { ComandaForm } from '../comanda-form/comanda-form';
+import { ComfortKitCard } from '../comfort-kit-card/comfort-kit-card';
 import { LucideAngularModule, X, User, Star, Utensils, Accessibility, AlertCircle, Info, AlertTriangle, CheckCircle2, Dog, Gift, Baby, Battery, Briefcase, Diamond, Crown } from 'lucide-angular';
 import { ParsedPassenger } from '../../../infrastructure/mockData';
 
 @Component({
   selector: 'app-passenger-modal',
   standalone: true,
-  imports: [CommonModule, ComandaForm, LucideAngularModule],
+  imports: [CommonModule, ComandaForm, ComfortKitCard, LucideAngularModule],
   templateUrl: './passenger-modal.html',
 })
 export class PassengerModal {
@@ -49,6 +50,9 @@ export class PassengerModal {
     const cabinClass = getCabinClass(man.aircraftType, seat);
     return cabinClass === 'business' && !!this.passenger();
   });
+
+  // El Kit de Confort es un obsequio de Business Class — misma elegibilidad que la comanda.
+  showComfortKit = computed(() => this.showComanda());
 
   getCodeDescription(code: string): string {
     for (const category of Object.values(FLIGHT_CODES)) {

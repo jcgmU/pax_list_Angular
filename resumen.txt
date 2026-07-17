@@ -1,0 +1,95 @@
+# INFORME TÉCNICO Y DE ARQUITECTURA: AVIANCA SEATMAP PRO (ANGULAR)
+
+Este documento detalla el alcance funcional, el stack tecnológico de la aplicación actual y los requerimientos clave para el diseño e integración del backend definitivo.
+
+---
+
+## 1. ¿QUÉ HACE LA APLICACIÓN? (Funcionalidades Clave)
+
+La aplicación es una herramienta de soporte a bordo diseñada para la tripulación de cabina (TC) con las siguientes capacidades:
+
+1.  **Mapa de Asientos Interactivo (Seat Map):**
+    *   Visualiza la distribución física real del avión en tiempo real (separado por cabinas: Business, Plus, Economy).
+    *   Muestra el estado de ocupación de cada asiento.
+2.  **Identificación de Estatus de Lealtad (LifeMiles):**
+    *   Destaca visualmente a los pasajeros VIP/Elite (Diamond y Gold) mediante estrellas e insignias de color en el mapa para priorizar su atención.
+3.  **Recuperación de Servicio (NPS - Net Promoter Score):**
+    *   Identifica proactivamente a pasajeros que sufrieron incidentes en vuelos anteriores (ej. pérdida de equipaje, retrasos).
+    *   Alerta a la tripulación con un marco rojo parpadeante en su asiento y despliega un banner de sugerencias de mitigación en su perfil.
+    *   Permite a la tripulación presionar un botón de "Atención Ofrecida" que marca el caso como resuelto en tiempo real, cambiando la alerta a un check verde.
+4.  **Gestión de Comandas de Comida (Business Class):**
+    *   Módulo para tomar comandas de entrada, plato fuerte y opciones de desayuno/almuerzo.
+    *   Control de inventario de platos en tiempo real.
+    *   Registra preferencias del pasajero como solicitudes de "No molestar" o "Despertar" en determinadas fases del vuelo.
+5.  **Seguimiento SSR (Special Service Requirements):**
+    *   Identifica necesidades específicas de los pasajeros en el mapa de asientos a través de iconos coloridos y descriptivos:
+        *   *Sillas de ruedas (WCHR/WCHS/WCHC)*
+        *   *Mascotas en cabina (PETC/SVAN)*
+        *   *Dietas especiales (VGML, GFML, etc.)*
+        *   *Menores de edad e infantes (INF, CHD)*
+        *   *Alertas Médicas o Legales (POC, deportados, etc.)*
+6.  **Dashboard de Estadísticas en Vivo (Tablet/Desktop View):**
+    *   Panel derecho que totaliza pasajeros a bordo, asientos vacíos, número de infantes, total de comidas especiales y desglose interactivo de pasajeros por cada código SSR.
+
+---
+
+## 2. ¿EN QUÉ ESTÁ CONSTRUIDA? (Stack Tecnológico)
+
+El frontend está desarrollado bajo estándares modernos del ecosistema web:
+
+*   **Framework Principal:** Angular (Standalone Components, última sintaxis de Control Flow `@if`, `@for`).
+*   **Gestión de Estado Reactivo:** Angular **Signals** (`signal`, `computed`). Actúan como la única fuente de verdad en el `StoreService`, eliminando la necesidad de librerías pesadas como NgRx.
+*   **Estilos y UI:** **Tailwind CSS v4** y animaciones personalizadas en CSS para una interfaz fluida y premium.
+*   **Iconografía:** `lucide-angular` para los gráficos vectoriales responsivos.
+*   **Arquitectura de Código (Clean Architecture):**
+    *   `/src/domain`: Contiene la lógica del negocio pura y descriptiva (códigos de vuelo, tipos de comida, mapeo de cabinas).
+    *   `/src/infrastructure`: Contiene el origen de datos (actualmente los Mocks de prueba).
+    *   `/src/app`: Aloja los componentes UI modulares (`seat-map`, `stats-sidebar`, `passenger-modal`, etc.) y el `StoreService`.
+
+---
+
+## 3. ¿QUÉ NECESITA EL BACKEND? (Fuentes de Información e Integración)
+
+Para pasar de un entorno demo con Mocks a un sistema real y funcional en producción, se requiere estructurar un **BFF (Backend for Frontend)** —preferiblemente en Node.js/NestJS— que centralice y simplifique la comunicación con los siguientes sistemas internos de la aerolínea:
+
+### A. Fuentes de Datos de Entrada (Lectura en Tierra)
+
+1.  **DCS (Departure Control System) / API de Vuelos:**
+    *   *Qué provee:* El listado final de pasajeros que han abordado (manifiesto de pasajeros real), asignación final de asientos y número de infantes (`INF`).
+    *   *Frecuencia:* Se consulta al cerrar la puerta del avión en tierra (antes del despegue).
+2.  **Sistema de Reservas (GDS / PSS - Amadeus/Sabre):**
+    *   *Qué provee:* Información de los PNR, incluyendo solicitudes de servicios especiales (SSR) agregados a la reserva.
+3.  **CRM de Lealtad (LifeMiles DB):**
+    *   *Qué provee:* El estatus actualizado del pasajero (Diamond, Gold, Silver) y su identificador de viajero frecuente.
+4.  **Sistema de Experiencia al Cliente (NPS / Salesforce):**
+    *   *Qué provee:* Registro de incidencias recientes de pasajeros frecuentes en las últimas 48-72 horas para encender las alertas de recuperación de servicio.
+5.  **Sistema de Catering / Provisioning:**
+    *   *Qué provee:* El inventario exacto y los nombres de los platos de comida cargados en las cocinas (galleys) de ese avión en particular para el vuelo del día.
+6.  **Crew Rostering / IAM (Identity and Access Management):**
+    *   *Qué provee:* Roles y credenciales de la tripulación asignada al vuelo para permitirles hacer login y asignarles las zonas del pasillo (ej. Pasillo Izquierdo / Pasillo Derecho).
+
+### B. Canales de Salida y Generación de Información (Escritura)
+
+1.  **API de Registro de Comandas:**
+    *   *Qué hace:* Al aterrizar, reporta qué pasajero consumió qué plato, las solicitudes no cubiertas por falta de inventario (unmet needs) y qué pasajeros solicitaron no ser molestados.
+    *   *Objetivo:* Conciliación de inventarios y análisis de demanda de menús.
+2.  **API de Cierre de Casos de Servicio (NPS Recovery):**
+    *   *Qué hace:* Envía un reporte al CRM de Experiencia (ej. Salesforce) confirmando que la tripulación abordó al pasajero con alertas NPS y le ofreció la compensación debida.
+    *   *Objetivo:* Cerrar el caso en tierra para evitar que Servicio al Cliente duplique esfuerzos de compensación.
+
+---
+
+## 4. ESTRATEGIA OFFLINE Y TIEMPO REAL (Operación en Vuelo)
+
+El backend debe diseñarse bajo la premisa de que los iPads **perderán conexión a internet en el aire**. La arquitectura recomendada incluye:
+
+1.  **Empaquetado Nativo (Capacitor):**
+    *   El frontend en Angular se compila como app nativa de iOS para ser instalada en los iPads vía MDM.
+2.  **Base de Datos Local (SQLite / RxDB / WatermelonDB):**
+    *   Al recibir internet en la puerta de embarque, la app descarga toda la información del vuelo y la guarda en una base de datos SQLite física dentro del iPad.
+    *   En vuelo, la aplicación lee y escribe únicamente en la base de datos local.
+3.  **Sincronización en Vuelo (Opción B - P2P):**
+    *   Mediante el framework nativo **Multipeer Connectivity** de Apple (vía un plugin de Capacitor), los iPads se sincronizan localmente mediante Bluetooth o Wi-Fi Direct.
+    *   *Ejemplo:* Si la tablet del pasillo izquierdo registra que se agotó la carne, envía un mensaje P2P inmediato a la tablet del pasillo derecho para actualizar su inventario en tiempo real sin requerir internet.
+4.  **Carga al Aterrizar (Re-sync):**
+    *   Al recuperar señal de red en el aeropuerto de destino, el motor local sincroniza en segundo plano todos los datos recopilados (comandas tomadas, alertas de NPS resueltas) hacia el BFF del Backend en tierra.

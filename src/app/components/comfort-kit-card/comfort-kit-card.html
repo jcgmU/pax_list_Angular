@@ -1,0 +1,95 @@
+<section class="border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm">
+  <div class="px-4 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+      <lucide-icon [name]="Shirt" [size]="10" class="text-slate-400"></lucide-icon>
+      Kit de Confort a Bordo
+    </span>
+    @if (isRegistered()) {
+      <span class="text-[8px] font-black px-2 py-0.5 rounded-md border uppercase tracking-wider bg-emerald-50 border-emerald-200/50 text-emerald-700 flex items-center gap-1">
+        <lucide-icon [name]="CheckCircle2" [size]="9"></lucide-icon>
+        Listo para entregar
+      </span>
+    } @else {
+      <span class="text-[8px] font-black px-2 py-0.5 rounded-md border uppercase tracking-wider bg-amber-50 border-amber-200/50 text-amber-700">
+        Pendiente de registro
+      </span>
+    }
+  </div>
+
+  <div class="p-4 space-y-3.5">
+    @if (isRegistered()) {
+      <p class="text-[10px] text-slate-400 leading-relaxed flex items-start gap-1.5">
+        <lucide-icon [name]="History" [size]="10" class="text-slate-300 shrink-0 mt-0.5"></lucide-icon>
+        Talla registrada en un vuelo anterior. Puede entregarse directamente sin preguntar, o ajustarla si el pasajero indica un cambio.
+      </p>
+    }
+
+    <div class="grid grid-cols-3 gap-2.5">
+      <!-- Sudadera -->
+      <div class="space-y-1.5">
+        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+          <lucide-icon [name]="Shirt" [size]="11" class="text-slate-400"></lucide-icon>
+          Sudadera
+        </label>
+        <div class="relative flex items-center">
+          <select
+            [value]="profile()?.hoodieSize ?? ''"
+            (change)="setHoodieSize($event)"
+            class="w-full pl-3 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-bold focus:ring-2 focus:ring-[#E20613]/25 outline-none transition-all appearance-none cursor-pointer"
+          >
+            <option value="" [selected]="!profile()?.hoodieSize">— Talla —</option>
+            @for (size of hoodieSizes; track size) {
+              <option [value]="size" [selected]="profile()?.hoodieSize === size">{{ size }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Pantalón -->
+      <div class="space-y-1.5">
+        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+          <lucide-icon [name]="Shirt" [size]="11" class="text-slate-400"></lucide-icon>
+          Pantalón
+        </label>
+        <div class="relative flex items-center">
+          <select
+            [value]="profile()?.pantsSize ?? ''"
+            (change)="setPantsSize($event)"
+            class="w-full pl-3 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-bold focus:ring-2 focus:ring-[#E20613]/25 outline-none transition-all appearance-none cursor-pointer"
+          >
+            <option value="" [selected]="!profile()?.pantsSize">— Talla —</option>
+            @for (size of pantsSizes; track size) {
+              <option [value]="size" [selected]="profile()?.pantsSize === size">{{ size }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Pantuflas -->
+      <div class="space-y-1.5">
+        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+          <lucide-icon [name]="Footprints" [size]="11" class="text-slate-400"></lucide-icon>
+          Pantuflas
+        </label>
+        <div class="relative flex items-center">
+          <select
+            [value]="profile()?.slipperSize ?? ''"
+            (change)="setSlipperSize($event)"
+            class="w-full pl-3 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-bold focus:ring-2 focus:ring-[#E20613]/25 outline-none transition-all appearance-none cursor-pointer"
+          >
+            <option value="" [selected]="!profile()?.slipperSize">— Talla —</option>
+            @for (size of slipperSizes; track size) {
+              <option [value]="size" [selected]="profile()?.slipperSize === size">{{ size }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    @if (profile()?.updatedAt) {
+      <p class="text-[9px] text-slate-350 text-right font-medium">
+        Última actualización: {{ formatUpdatedAt(profile()?.updatedAt) }}
+      </p>
+    }
+  </div>
+</section>

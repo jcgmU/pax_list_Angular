@@ -7,6 +7,9 @@ import { countEmptySeats, countSSR, countMeals } from '../domain/flightStats';
 import type { ServiceType, MealSlot, CrewZone } from '../domain/mealService';
 import { deriveMealSlots, seatZone } from '../domain/mealService';
 import { getCabinClass } from '../domain/cabinLookup';
+import type { ComfortKitProfile, ComfortKitSizes } from '../domain/comfortKit';
+import { deriveTravelerId } from '../domain/comfortKit';
+import { loadComfortKitProfiles, saveComfortKitProfile } from '../infrastructure/comfortKitProfiles';
 
 export interface CourseSelection {
   entradaId?: string;
@@ -31,6 +34,8 @@ export class StoreService {
   unavailable = signal<Record<string, boolean>>({});
   crewZone = signal<CrewZone | null>(null);
   comandaOpen = signal<boolean>(false);
+  // Perfiles de talla del Kit de Confort, persistidos entre vuelos por pasajero.
+  comfortKitProfiles = signal<Record<string, ComfortKitProfile>>(loadComfortKitProfiles());
 
   // Computed properties replacing 'get' methods
   activeServiceType = computed(() => {
@@ -193,5 +198,28 @@ export class StoreService {
     const man = this.manifest();
     if (!man) return undefined;
     return this.orders()[`${man.flightNumber}::${seat}`];
+  }
+
+  getComfortKitProfile(passenger: ParsedPassenger): ComfortKitProfile | undefined {
+    return this.comfortKitProfiles()[deriveTravelerId(passenger)];
+  }
+
+  setComfortKitSizes(passenger: ParsedPassenger, sizes: ComfortKitSizes) {
+    const travelerId = deriveTravelerId(passenger);
+    const updated = saveComfortKitProfile(travelerId, sizes);
+    this.comfortKitProfiles.update(profiles => ({ ...profiles, [travelerId]: updated }));
+  }
+
+  recoverNps(seat: string) {
+    this.manifest.update(man => {
+      if (!man) return man;
+      const updatedPassengers = man.passengers.map(p => {
+        if (p.seat === seat && p.nps) {
+          return { ...p, nps: { ...p.nps, recovered: true } };
+        }
+        return p;
+      });
+      return { ...man, passengers: updatedPassengers };
+    });
   }
 }

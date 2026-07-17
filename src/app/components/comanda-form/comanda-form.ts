@@ -4,7 +4,7 @@ import { StoreService } from '../../store.service';
 import { buildCourses, deriveMealSlots, seatZone, MealSlot, MenuItem, CrewZone } from '../../../domain/mealService';
 import { FLIGHT_CODES } from '../../../domain/flightCodes';
 import { ParsedPassenger } from '../../../infrastructure/mockData';
-import { LucideAngularModule, Bell, BellOff, ChefHat, UtensilsCrossed, CheckCircle2, UserX } from 'lucide-angular';
+import { LucideAngularModule, Bell, BellOff, ChefHat, UtensilsCrossed, CheckCircle2, UserX, ChevronDown } from 'lucide-angular';
 
 const SERVICE_LABELS: Record<string, { label: string; color: string }> = {
   INSIGNIA: { label: 'Servicio Insignia', color: 'text-amber-700 bg-amber-50 border-amber-200' },
@@ -33,6 +33,7 @@ export class ComandaForm {
   readonly UtensilsCrossed = UtensilsCrossed;
   readonly CheckCircle2 = CheckCircle2;
   readonly UserX = UserX;
+  readonly ChevronDown = ChevronDown;
 
   manifest = this.store.manifest;
   activeServiceType = this.store.activeServiceType;

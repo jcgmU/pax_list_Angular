@@ -177,6 +177,11 @@
             }
           </section>
 
+          <!-- Kit de Confort (Business Only) -->
+          @if (showComfortKit()) {
+            <app-comfort-kit-card [passenger]="passenger()!"></app-comfort-kit-card>
+          }
+
           <!-- Comanda Food Form (Business Only) -->
           @if (showComanda()) {
             <div class="border-t border-slate-100 pt-6">
