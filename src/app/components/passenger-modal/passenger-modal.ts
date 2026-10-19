@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StoreService } from '../../store.service';
 import { FLIGHT_CODES } from '../../../domain/flightCodes';
@@ -61,6 +61,7 @@ export class PassengerModal {
     return 'Requerimiento especial';
   }
 
+  @HostListener('document:keydown.escape')
   close() {
     this.store.setSelectedSeat(null);
   }
@@ -81,35 +82,35 @@ export class PassengerModal {
 
   getIconInfo(code: string) {
     let Icon = this.Info;
-    let iconColor = 'bg-slate-100 text-slate-500';
+    let iconColor = 'bg-fg/[0.07] text-fg-3';
 
     if (['WCHR', 'WCHS', 'WCHC', 'WCMP', 'WCOB'].includes(code)) {
       Icon = this.Accessibility;
-      iconColor = 'bg-blue-100 text-blue-600';
+      iconColor = 'bg-blue-500/15 text-blue-700 dark:text-blue-300';
     } else if (Object.keys(FLIGHT_CODES.ANIMALS).includes(code)) {
       Icon = this.Dog;
-      iconColor = 'bg-orange-100 text-orange-600';
+      iconColor = 'bg-orange-500/15 text-orange-700 dark:text-orange-300';
     } else if (Object.keys(FLIGHT_CODES.MEALS).includes(code)) {
       Icon = this.Utensils;
-      iconColor = 'bg-green-100 text-green-600';
+      iconColor = 'bg-green-500/15 text-green-700 dark:text-green-300';
     } else if (
       Object.keys(FLIGHT_CODES.MEDICAL).includes(code) ||
       Object.keys(FLIGHT_CODES.LEGAL).includes(code)
     ) {
       Icon = this.AlertCircle;
-      iconColor = 'bg-rose-100 text-rose-600';
+      iconColor = 'bg-rose-500/15 text-rose-700 dark:text-rose-300';
     } else if (Object.keys(FLIGHT_CODES.BATTERIES).includes(code)) {
       Icon = this.Battery;
-      iconColor = 'bg-yellow-100 text-yellow-700';
+      iconColor = 'bg-yellow-500/15 text-yellow-700 dark:text-yellow-300';
     } else if (Object.keys(FLIGHT_CODES.ASSISTANCE).includes(code)) {
       Icon = this.Briefcase;
-      iconColor = 'bg-indigo-100 text-indigo-600';
+      iconColor = 'bg-indigo-500/15 text-indigo-700 dark:text-indigo-300';
     } else if (code === 'BDAY') {
       Icon = this.Gift;
-      iconColor = 'bg-pink-100 text-pink-600';
+      iconColor = 'bg-pink-500/15 text-pink-700 dark:text-pink-300';
     } else if (code === 'INF' || code === 'CHD') {
       Icon = this.Baby;
-      iconColor = 'bg-cyan-100 text-cyan-600';
+      iconColor = 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300';
     }
 
     return { Icon, iconColor };

@@ -19,9 +19,9 @@ const SLOT_LABELS: Record<string, string> = {
 };
 
 const ROUTE_COLORS = [
-  { bg: 'bg-blue-50', border: 'border-blue-200', flightBadge: 'bg-blue-600 text-white', btn: 'bg-blue-600 hover:bg-blue-700', serviceBadge: 'bg-blue-100 text-blue-800 border-blue-200' },
-  { bg: 'bg-amber-50', border: 'border-amber-200', flightBadge: 'bg-amber-600 text-white', btn: 'bg-amber-600 hover:bg-amber-700', serviceBadge: 'bg-amber-100 text-amber-800 border-amber-200' },
-  { bg: 'bg-rose-50', border: 'border-rose-200', flightBadge: 'bg-[#E20613] text-white', btn: 'bg-[#E20613] hover:bg-red-700', serviceBadge: 'bg-rose-100 text-rose-800 border-rose-200' },
+  { bg: 'bg-blue-500/10', border: 'border-blue-500/25', flightBadge: 'bg-blue-600 text-white', btn: 'bg-blue-600 hover:bg-blue-700', serviceBadge: 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/25' },
+  { bg: 'bg-amber-500/10', border: 'border-amber-500/25', flightBadge: 'bg-amber-600 text-white', btn: 'bg-amber-600 hover:bg-amber-700', serviceBadge: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/25' },
+  { bg: 'bg-rose-500/10', border: 'border-rose-500/25', flightBadge: 'bg-[#E20613] text-white', btn: 'bg-[#E20613] hover:bg-red-700', serviceBadge: 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/25' },
 ];
 
 @Component({

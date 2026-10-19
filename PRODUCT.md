@@ -1,5 +1,11 @@
 # Product
 
+<!-- impeccable:product-schema 1 -->
+
+## Platform
+
+web
+
 ## Register
 
 product
@@ -29,3 +35,14 @@ Profesional, Eficiente, Confiable. Un diseño de grado de aviación que se sient
 - Contraste WCAG AA (mínimo 4.5:1 para textos y 3:1 para elementos de control).
 - Compatibilidad completa con el modo de reducción de movimiento del sistema (`prefers-reduced-motion`).
 - Foco táctil claro y etiquetas semánticas para lectores de pantalla.
+
+## Operating Context
+Aplicación web usada por la tripulación en un tablet o móvil durante el vuelo, con iluminación de cabina variable (luz tenue o resplandor de sol). Los flujos son: elegir vuelo, consultar el mapa de asientos, atender alertas NPS, tomar comandas en Business y revisar estadísticas de pasajeros (SSR, estatus, membresías).
+
+## Capabilities and Constraints
+- Angular con Signals; `StoreService` es la única fuente de verdad del estado.
+- Hoy todos los datos son de demostración (`mockData.ts`, `aircraftConfigs.ts`); la conexión a una API real es un paso futuro (ver README).
+- "Offline-first" es un objetivo del producto, aún no implementado (no hay service worker ni manifest).
+
+## Evidence on Hand
+Solo datos mock de vuelos, pasajeros y menús en el repositorio. No hay pasajeros, métricas, testimonios ni casos reales: el trabajo futuro no debe inventarlos.

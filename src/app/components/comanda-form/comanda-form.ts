@@ -7,8 +7,8 @@ import { ParsedPassenger } from '../../../infrastructure/mockData';
 import { LucideAngularModule, Bell, BellOff, ChefHat, UtensilsCrossed, CheckCircle2, UserX, ChevronDown } from 'lucide-angular';
 
 const SERVICE_LABELS: Record<string, { label: string; color: string }> = {
-  INSIGNIA: { label: 'Servicio Insignia', color: 'text-amber-700 bg-amber-50 border-amber-200' },
-  AMERICAS: { label: 'Business Class Americas', color: 'text-blue-700 bg-blue-50 border-blue-200' },
+  INSIGNIA: { label: 'Servicio Insignia', color: 'text-amber-700 dark:text-amber-300 bg-amber-500/10 border-amber-500/25' },
+  AMERICAS: { label: 'Business Class Americas', color: 'text-blue-700 dark:text-blue-300 bg-blue-500/10 border-blue-500/25' },
 };
 
 const SLOT_ICONS: Record<string, string> = {

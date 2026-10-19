@@ -1,88 +1,172 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 @import 'tailwindcss';
 
+/* Theme is set on <html data-theme="dark|light"> */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
-  --font-sans: 'Inter', sans-serif;
-  --font-display: 'Outfit', sans-serif;
+  --font-sans: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-display: 'Outfit', system-ui, sans-serif;
+
+  /* Surfaces: graphite with a warm undertone, never pure black */
+  --color-ink: #0b0c0f;
+  --color-panel: #13151a;
+  --color-panel-2: #1a1d24;
+  --color-panel-3: #232730;
+  --color-line: rgb(255 255 255 / 0.08);
+  --color-line-strong: rgb(255 255 255 / 0.16);
+
+  /* Text on graphite, all >= 4.5:1 on panel */
+  --color-fg: #f5f5f6;
+  --color-fg-2: #c9ccd3;
+  --color-fg-3: #9da3af;
+
+  /* Avianca red: fills use brand, text on dark uses the lifted tint */
+  --color-brand: #e20613;
+  --color-brand-hi: #ff2d3b;
+  --color-brand-text: #ff6670;
+  --color-ember: #ff4a1c;
+}
+
+:root {
+  color-scheme: dark;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-feedback: 150ms;
+  --duration-state: 200ms;
+  --duration-layout: 300ms;
+}
+
+/* Light: warm paper canvas, white panels, ink text; brand text darkened for 4.5:1 on white */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --color-ink: #f3f1ee;
+  --color-panel: #ffffff;
+  --color-panel-2: #f6f5f3;
+  --color-panel-3: #e9e7e3;
+  --color-line: rgb(15 18 24 / 0.1);
+  --color-line-strong: rgb(15 18 24 / 0.2);
+  --color-fg: #12141a;
+  --color-fg-2: #3a4150;
+  --color-fg-3: #5a6270;
+  --color-brand-hi: #c40510;
+  --color-brand-text: #c4000f;
+}
+
+:root {
+  --glow-a: rgb(226 6 19 / 0.22);
+  --glow-b: rgb(255 74 28 / 0.1);
+  --glass-top: rgb(255 255 255 / 0.05);
+  --glass-bottom: rgb(255 255 255 / 0.015);
+  --glass-base: rgb(19 21 26 / 0.72);
+  --fuselage-glow: rgb(226 6 19 / 0.28);
+  --scroll-thumb: rgb(255 255 255 / 0.18);
+}
+:root[data-theme='light'] {
+  --glow-a: rgb(226 6 19 / 0.09);
+  --glow-b: rgb(255 74 28 / 0.05);
+  --glass-top: rgb(255 255 255 / 0.9);
+  --glass-bottom: rgb(255 255 255 / 0.6);
+  --glass-base: rgb(255 255 255 / 0.7);
+  --fuselage-glow: rgb(226 6 19 / 0.14);
+  --scroll-thumb: rgb(15 18 24 / 0.25);
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: #f8fafc; /* slate-50 */
+  background-color: var(--color-ink);
+  background-image:
+    radial-gradient(60rem 36rem at 8% -10%, var(--glow-a), transparent 60%),
+    radial-gradient(48rem 30rem at 100% 0%, var(--glow-b), transparent 60%);
+  background-attachment: fixed;
+  color: var(--color-fg);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, .font-display {
   font-family: var(--font-display);
 }
 
-/* Custom premium scrollbars */
+/* Browser surfaces carry the palette */
+::selection {
+  background: rgb(226 6 19 / 0.45);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand-text);
+  outline-offset: 2px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) transparent;
+}
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-/* Glassmorphism effects */
+/* Panel: translucent graphite lifted by a top highlight; border declares elevation */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: linear-gradient(180deg, var(--glass-top), var(--glass-bottom)), var(--glass-base);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--color-line);
 }
 
 .glass-panel-dark {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--color-ink) 82%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--color-line);
 }
 
-/* Glowing alerts and status effects */
+/* Status alerts: pulse only while the alert is unattended */
+/* Fuselage: one brand glow at the nose, theme-aware */
+.fuselage {
+  background:
+    radial-gradient(ellipse 70% 36% at 50% 0%, var(--fuselage-glow), transparent),
+    linear-gradient(180deg, var(--glass-top), var(--glass-bottom));
+}
+
 @keyframes pulse-glow-rose {
   0%, 100% {
-    box-shadow: 0 0 4px rgba(244, 63, 94, 0.4);
-    border-color: rgba(244, 63, 94, 0.4);
+    box-shadow: 0 0 4px rgb(244 63 94 / 0.4);
+    border-color: rgb(244 63 94 / 0.5);
   }
   50% {
-    box-shadow: 0 0 14px rgba(244, 63, 94, 0.8);
-    border-color: rgba(244, 63, 94, 0.9);
+    box-shadow: 0 0 14px rgb(244 63 94 / 0.8);
+    border-color: rgb(244 63 94 / 0.95);
   }
 }
-
 .animate-glow-rose {
   animation: pulse-glow-rose 2s infinite ease-in-out;
 }
 
 @keyframes pulse-glow-gold {
-  0%, 100% {
-    box-shadow: 0 0 4px rgba(245, 158, 11, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
-  }
+  0%, 100% { box-shadow: 0 0 4px rgb(245 158 11 / 0.3); }
+  50% { box-shadow: 0 0 12px rgb(245 158 11 / 0.6); }
 }
-
 .animate-glow-gold {
   animation: pulse-glow-gold 2.5s infinite ease-in-out;
 }
 
 @keyframes pulse-glow-purple {
-  0%, 100% {
-    box-shadow: 0 0 4px rgba(168, 85, 247, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
-  }
+  0%, 100% { box-shadow: 0 0 4px rgb(168 85 247 / 0.3); }
+  50% { box-shadow: 0 0 12px rgb(168 85 247 / 0.6); }
 }
-
 .animate-glow-purple {
   animation: pulse-glow-purple 2.5s infinite ease-in-out;
 }
 
-/* Ticket curve cuts for boarding passes */
+/* Ticket notches match the panel they sit on */
 .ticket-cut {
   position: relative;
 }
@@ -92,80 +176,41 @@ h1, h2, h3, h4, .font-display {
   position: absolute;
   width: 16px;
   height: 16px;
-  background-color: #f8fafc; /* Match container background */
+  background-color: var(--color-panel);
   border-radius: 50%;
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
 }
-.ticket-cut::before {
-  left: -8px;
-}
-.ticket-cut::after {
-  right: -8px;
-}
+.ticket-cut::before { left: -8px; }
+.ticket-cut::after { right: -8px; }
 
-/* Easing and Animation Variables */
-:root {
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
-  --duration-feedback: 150ms;
-  --duration-state: 250ms;
-  --duration-layout: 350ms;
-  --duration-entrance: 650ms;
-}
-
-/* Staggered card entrance */
 @keyframes fade-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
 .animate-stagger-item {
   opacity: 0;
-  animation: fade-slide-up var(--duration-entrance) var(--ease-out-expo) forwards;
-  animation-delay: calc(var(--i, 0) * 70ms);
+  animation: fade-slide-up 450ms var(--ease-out-expo) forwards;
+  animation-delay: calc(var(--i, 0) * 50ms);
 }
 
-/* Slide in from right for sidebar elements */
 @keyframes slide-in-right {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
 }
-
 .animate-slide-in-right {
   animation: slide-in-right var(--duration-layout) var(--ease-out-expo) forwards;
 }
 
-/* Scale and fade modal entrance */
 @keyframes modal-zoom-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96) translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+  from { opacity: 0; transform: scale(0.97) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
-
 .animate-modal-entry {
   animation: modal-zoom-in var(--duration-layout) var(--ease-out-expo) forwards;
 }
 
-/* Accessibility: prefers-reduced-motion check */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;

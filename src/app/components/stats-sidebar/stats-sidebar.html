@@ -1,8 +1,8 @@
 @if (manifest()) {
   <!-- Desktop/Tablet Sidebar (md+) -->
-  <aside class="hidden md:flex flex-col w-80 h-full bg-white rounded-3xl shadow-xl border border-slate-200/60 m-4 p-6 overflow-hidden animate-in slide-in-from-right duration-350">
-    <h2 class="text-[#E20613] font-black text-lg mb-4 uppercase italic tracking-tighter shrink-0 flex items-center gap-2">
-      <lucide-angular [img]="BarChart2" size="18" class="text-[#E20613]"></lucide-angular>
+  <aside class="hidden md:flex flex-col w-full h-auto lg:h-full glass-panel rounded-3xl p-6 overflow-hidden animate-in slide-in-from-right duration-300">
+    <h2 class="text-fg font-semibold text-lg mb-4 tracking-tight shrink-0 flex items-center gap-2">
+      <lucide-angular [img]="BarChart2" size="18" class="text-fg-3"></lucide-angular>
       Estadísticas
     </h2>
 
@@ -12,57 +12,57 @@
       <!-- Bento Grid for Flight Stats -->
       <div class="grid grid-cols-2 gap-2.5 shrink-0">
         <!-- Bento Card 1: Total Pax -->
-        <div class="col-span-2 p-4 bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl flex flex-col justify-between min-h-[90px] shadow-sm relative overflow-hidden">
+        <div class="col-span-2 p-4 bg-fg/[0.06] border border-line text-fg rounded-2xl flex flex-col justify-between min-h-[90px] shadow-sm relative overflow-hidden">
           <div class="absolute right-[-10px] bottom-[-10px] opacity-10 text-white pointer-events-none">
             <lucide-angular [img]="Users" size="70"></lucide-angular>
           </div>
-          <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">Pasajeros a Bordo</span>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-fg-3">Pasajeros a Bordo</span>
           <div class="flex items-baseline justify-between mt-2 z-10">
-            <span class="text-3xl font-black font-display tracking-tight">{{ stats().totalPassengers }}</span>
-            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">pax</span>
+            <span class="text-3xl font-bold font-display tracking-tight">{{ stats().totalPassengers }}</span>
+            <span class="text-[11px] font-bold text-fg-3 uppercase tracking-widest">pax</span>
           </div>
         </div>
 
         <!-- Bento Card 2: Sillas Vacías -->
-        <div class="p-3 bg-blue-50/70 border border-blue-100/50 text-blue-700 rounded-2xl flex flex-col justify-between min-h-[80px]">
-          <span class="text-[9px] font-black uppercase tracking-wider text-blue-400">Sillas Vacías</span>
-          <span class="text-2xl font-black font-display tracking-tight mt-2">{{ stats().emptySeats }}</span>
+        <div class="p-3 bg-fg/[0.04] border border-line text-fg rounded-2xl flex flex-col justify-between min-h-[80px]">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-fg-3">Sillas Vacías</span>
+          <span class="text-2xl font-bold font-display tracking-tight mt-2">{{ stats().emptySeats }}</span>
         </div>
 
         <!-- Bento Card 3: Infantes -->
-        <div class="p-3 bg-sky-50/70 border border-sky-100/50 text-sky-700 rounded-2xl flex flex-col justify-between min-h-[80px]">
-          <span class="text-[9px] font-black uppercase tracking-wider text-sky-400">Infantes (INF)</span>
-          <span class="text-2xl font-black font-display tracking-tight mt-2">{{ stats().infantCount }}</span>
+        <div class="p-3 bg-fg/[0.04] border border-line text-fg rounded-2xl flex flex-col justify-between min-h-[80px]">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-fg-3">Infantes (INF)</span>
+          <span class="text-2xl font-bold font-display tracking-tight mt-2">{{ stats().infantCount }}</span>
         </div>
 
         <!-- Bento Card 4: Especiales SSR -->
-        <div class="p-3 bg-purple-50/70 border border-purple-100/50 text-purple-700 rounded-2xl flex flex-col justify-between min-h-[80px]">
-          <span class="text-[9px] font-black uppercase tracking-wider text-purple-400">Servicios SSR</span>
-          <span class="text-2xl font-black font-display tracking-tight mt-2">{{ totalSSR() }}</span>
+        <div class="p-3 bg-fg/[0.04] border border-line text-fg rounded-2xl flex flex-col justify-between min-h-[80px]">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-fg-3">Servicios SSR</span>
+          <span class="text-2xl font-bold font-display tracking-tight mt-2">{{ totalSSR() }}</span>
         </div>
 
         <!-- Bento Card 5: Comidas -->
-        <div class="p-3 bg-emerald-50/70 border border-emerald-100/50 text-emerald-700 rounded-2xl flex flex-col justify-between min-h-[80px]">
-          <span class="text-[9px] font-black uppercase tracking-wider text-emerald-400">Comidas</span>
-          <span class="text-2xl font-black font-display tracking-tight mt-2">{{ stats().totalMeals }}</span>
+        <div class="p-3 bg-fg/[0.04] border border-line text-fg rounded-2xl flex flex-col justify-between min-h-[80px]">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-fg-3">Comidas</span>
+          <span class="text-2xl font-bold font-display tracking-tight mt-2">{{ stats().totalMeals }}</span>
         </div>
       </div>
 
       <!-- SSR Codes Section -->
       @if (ssrCodes().length > 0) {
-        <div class="mt-4 pt-4 border-t border-slate-100">
-          <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Servicios por Código</h3>
+        <div class="mt-4 pt-4 border-t border-line">
+          <h3 class="text-[11px] font-bold text-fg-3 uppercase tracking-widest mb-3">Servicios por Código</h3>
           <div class="grid grid-cols-2 gap-2">
             @for (code of ssrCodes(); track code) {
               <button
                 (click)="handleCodeClick(code)"
-                class="bg-slate-50 hover:bg-slate-100/80 cursor-pointer p-2 rounded-xl flex justify-between items-center transition-all border border-slate-100"
+                class="bg-panel-2 hover:bg-fg/5 cursor-pointer min-h-11 px-3 rounded-xl flex justify-between items-center transition-colors border border-line"
                 [class.ring-2]="expandedCode() === code"
                 [class.ring-[#E20613]/20]="expandedCode() === code"
-                [class.bg-slate-100]="expandedCode() === code"
+                [class.bg-fg/[0.07]]="expandedCode() === code"
               >
-                <span class="text-[9px] font-black text-slate-500">{{ code }}</span>
-                <span class="text-xs font-black text-slate-700">{{ stats().ssrCounts[code] }}</span>
+                <span class="text-[11px] font-bold text-fg-3">{{ code }}</span>
+                <span class="text-xs font-bold text-fg-2">{{ stats().ssrCounts[code] }}</span>
               </button>
             }
           </div>
@@ -75,15 +75,15 @@
                [class.max-h-0]="!expandedCode() || stats().ssrCounts[expandedCode()!] === undefined"
                [class.opacity-0]="!expandedCode() || stats().ssrCounts[expandedCode()!] === undefined">
             @if (expandedCode() && stats().ssrCounts[expandedCode()!] !== undefined) {
-              <div class="bg-slate-50/50 border border-slate-200/50 rounded-xl p-3 shadow-inner">
-                <div class="flex justify-between items-center mb-2 pb-1.5 border-b border-slate-200/50">
-                  <span class="text-[10px] font-black text-slate-700 uppercase tracking-wider">{{ expandedCode() }}</span>
-                  <span class="text-[9px] font-bold text-slate-400">{{ stats().ssrCounts[expandedCode()!] }} pax</span>
+              <div class="bg-fg/[0.03] border border-line-strong rounded-xl p-3 shadow-inner">
+                <div class="flex justify-between items-center mb-2 pb-1.5 border-b border-line-strong">
+                  <span class="text-xs font-bold text-fg-2 uppercase tracking-wider">{{ expandedCode() }}</span>
+                  <span class="text-[11px] font-bold text-fg-3">{{ stats().ssrCounts[expandedCode()!] }} pax</span>
                 </div>
                 <div class="space-y-1">
                   @for (p of getPassengersForCode(expandedCode()!); track p.seat) {
-                    <p class="text-[10px] text-slate-600 break-words leading-relaxed">
-                      <span class="font-black text-slate-900 bg-slate-200/60 px-1 py-0.5 rounded mr-1.5">{{ p.seat }}</span>
+                    <p class="text-xs text-fg-2 break-words leading-relaxed">
+                      <span class="font-bold text-fg bg-fg/10 px-1 py-0.5 rounded mr-1.5">{{ p.seat }}</span>
                       {{ p.lastName }}, {{ p.firstName }}
                     </p>
                   }
@@ -96,20 +96,20 @@
 
       <!-- Elite Passengers Section -->
       @if (magnoPax().length > 0 || diamondPax().length > 0 || goldPax().length > 0) {
-        <div class="mt-4 pt-4 border-t border-slate-100 space-y-4">
-          <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pasajeros Elite</h3>
+        <div class="mt-4 pt-4 border-t border-line space-y-4">
+          <h3 class="text-[11px] font-bold text-fg-3 uppercase tracking-widest">Pasajeros Elite</h3>
 
           @if (magnoPax().length > 0) {
-            <div class="mb-3 bg-slate-50 border border-slate-150 p-2.5 rounded-2xl animate-glow-purple">
+            <div class="mb-3 bg-panel-2 border border-line p-2.5 rounded-2xl animate-glow-purple">
               <div class="flex items-center gap-1.5 px-2 py-1 bg-gradient-to-br from-[#3c1053] to-[#ad5389] rounded-lg mb-2 shadow-sm">
                 <lucide-angular [img]="Crown" size="8" class="text-white shrink-0 fill-white"></lucide-angular>
-                <span class="text-[8px] font-black text-white uppercase tracking-widest">Magno</span>
-                <span class="ml-auto text-[8px] font-black text-white/70">{{ magnoPax().length }}</span>
+                <span class="text-[11px] font-bold text-white uppercase tracking-widest">Magno</span>
+                <span class="ml-auto text-[11px] font-bold text-white/70">{{ magnoPax().length }}</span>
               </div>
               <div class="space-y-1 pl-1">
                 @for (p of magnoPax(); track p.seat) {
-                  <p class="text-[10px] text-slate-600 break-words leading-relaxed">
-                    <span class="font-black text-slate-900 mr-1.5 bg-slate-200/60 px-1 py-0.5 rounded">{{ p.seat }}</span>
+                  <p class="text-xs text-fg-2 break-words leading-relaxed">
+                    <span class="font-bold text-fg mr-1.5 bg-fg/10 px-1 py-0.5 rounded">{{ p.seat }}</span>
                     {{ p.lastName }}, {{ p.firstName }}
                   </p>
                 }
@@ -118,16 +118,16 @@
           }
 
           @if (diamondPax().length > 0) {
-            <div class="mb-3 bg-slate-50 border border-slate-150 p-2.5 rounded-2xl">
+            <div class="mb-3 bg-panel-2 border border-line p-2.5 rounded-2xl">
               <div class="flex items-center gap-1.5 px-2 py-1 bg-slate-900 rounded-lg mb-2 shadow-sm">
                 <lucide-angular [img]="Diamond" size="8" class="text-white shrink-0 fill-white"></lucide-angular>
-                <span class="text-[8px] font-black text-white uppercase tracking-widest">Diamond</span>
-                <span class="ml-auto text-[8px] font-black text-slate-400">{{ diamondPax().length }}</span>
+                <span class="text-[11px] font-bold text-white uppercase tracking-widest">Diamond</span>
+                <span class="ml-auto text-[11px] font-bold text-fg-3">{{ diamondPax().length }}</span>
               </div>
               <div class="space-y-1 pl-1">
                 @for (p of diamondPax(); track p.seat) {
-                  <p class="text-[10px] text-slate-600 break-words leading-relaxed">
-                    <span class="font-black text-slate-900 mr-1.5 bg-slate-200/60 px-1 py-0.5 rounded">{{ p.seat }}</span>
+                  <p class="text-xs text-fg-2 break-words leading-relaxed">
+                    <span class="font-bold text-fg mr-1.5 bg-fg/10 px-1 py-0.5 rounded">{{ p.seat }}</span>
                     {{ p.lastName }}, {{ p.firstName }}
                   </p>
                 }
@@ -136,16 +136,16 @@
           }
 
           @if (goldPax().length > 0) {
-            <div class="bg-slate-50 border border-slate-150 p-2.5 rounded-2xl">
+            <div class="bg-panel-2 border border-line p-2.5 rounded-2xl">
               <div class="flex items-center gap-1.5 px-2 py-1 bg-gradient-to-br from-amber-400 to-amber-500 rounded-lg mb-2 shadow-sm">
                 <lucide-angular [img]="Star" size="8" class="text-amber-950 shrink-0 fill-amber-950"></lucide-angular>
-                <span class="text-[8px] font-black text-amber-950 uppercase tracking-widest">Gold</span>
-                <span class="ml-auto text-[8px] font-black text-amber-950/70">{{ goldPax().length }}</span>
+                <span class="text-[11px] font-bold text-amber-950 uppercase tracking-widest">Gold</span>
+                <span class="ml-auto text-[11px] font-bold text-amber-950/70">{{ goldPax().length }}</span>
               </div>
               <div class="space-y-1 pl-1">
                 @for (p of goldPax(); track p.seat) {
-                  <p class="text-[10px] text-slate-600 break-words leading-relaxed">
-                    <span class="font-black text-slate-900 mr-1.5 bg-slate-200/60 px-1 py-0.5 rounded">{{ p.seat }}</span>
+                  <p class="text-xs text-fg-2 break-words leading-relaxed">
+                    <span class="font-bold text-fg mr-1.5 bg-fg/10 px-1 py-0.5 rounded">{{ p.seat }}</span>
                     {{ p.lastName }}, {{ p.firstName }}
                   </p>
                 }
@@ -157,34 +157,34 @@
 
       <!-- Comanda Business Section -->
       @if (comandaData(); as cd) {
-        <div class="mt-4 pt-4 border-t border-slate-100">
+        <div class="mt-4 pt-4 border-t border-line">
           <div class="flex items-center gap-2 mb-3">
-            <lucide-angular [img]="ChefHat" size="13" class="text-[#E20613]"></lucide-angular>
-            <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+            <lucide-angular [img]="ChefHat" size="13" class="text-brand-text"></lucide-angular>
+            <h3 class="text-[11px] font-bold text-fg-3 uppercase tracking-widest">
               Comanda Business
             </h3>
           </div>
 
-          <div class="text-[8px] font-black px-2 py-0.5 rounded-md inline-block mb-3 uppercase tracking-wider"
-               [ngClass]="cd.serviceType === 'INSIGNIA' ? 'bg-amber-50 text-amber-700 border border-amber-200/50' : 'bg-blue-50 text-blue-700 border border-blue-200/50'">
+          <div class="text-[11px] font-bold px-2 py-0.5 rounded-md inline-block mb-3 uppercase tracking-wider"
+               [ngClass]="cd.serviceType === 'INSIGNIA' ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/25' : 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/25'">
             {{ cd.serviceLabel }}
           </div>
 
           <!-- Comandas progress tracking -->
-          <div class="flex items-center justify-between bg-slate-50 border border-slate-100 rounded-2xl p-3 mb-2.5">
+          <div class="flex items-center justify-between bg-panel-2 border border-line rounded-2xl p-3 mb-2.5">
             <div class="flex items-center gap-2">
               <lucide-angular [img]="CheckCircle2" size="14" 
                    [class]="cd.comandasTomadas === cd.businessPaxCount ? 'text-green-500' : 'text-slate-300'">
               </lucide-angular>
-              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Comandas Tomadas</span>
+              <span class="text-xs font-bold text-fg-3 uppercase tracking-wide">Comandas Tomadas</span>
             </div>
-            <span class="text-xs font-black text-slate-800">
+            <span class="text-xs font-bold text-fg">
               {{ cd.comandasTomadas }} / {{ cd.businessPaxCount }}
             </span>
           </div>
 
           @if (cd.businessPaxCount > 0) {
-            <div class="w-full h-1.5 bg-slate-100 rounded-full mb-4 overflow-hidden border border-slate-200/30">
+            <div class="w-full h-1.5 bg-fg/[0.07] rounded-full mb-4 overflow-hidden border border-line-strong">
               <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
                    [style.width]="(cd.comandasTomadas / cd.businessPaxCount) * 100 + '%'">
               </div>
@@ -196,15 +196,15 @@
             <div class="mb-3 bg-slate-900 text-white p-2.5 rounded-2xl border border-slate-800/80 shadow-md">
               <div class="flex items-center gap-1.5 px-2 py-1 bg-white/10 rounded-lg mb-2">
                 <lucide-angular [img]="Bell" size="9" class="text-amber-400 shrink-0 fill-amber-400 animate-pulse"></lucide-angular>
-                <span class="text-[8px] font-black uppercase tracking-widest text-slate-200">
+                <span class="text-[11px] font-bold uppercase tracking-widest text-slate-200">
                   Despertar · {{ wu.label }}
                 </span>
-                <span class="ml-auto text-[8px] font-black text-slate-400">{{ wu.seats.length }}</span>
+                <span class="ml-auto text-[11px] font-bold text-slate-400">{{ wu.seats.length }}</span>
               </div>
               <div class="space-y-1 pl-1">
                 @for (p of wu.seats; track p.seat) {
-                  <p class="text-[10px] text-slate-300 leading-relaxed">
-                    <span class="font-black text-white mr-1.5 bg-white/10 px-1 py-0.5 rounded">{{ p.seat }}</span>
+                  <p class="text-xs text-slate-300 leading-relaxed">
+                    <span class="font-bold text-white mr-1.5 bg-white/10 px-1 py-0.5 rounded">{{ p.seat }}</span>
                     {{ p.lastName }}, {{ p.firstName }}
                   </p>
                 }
@@ -213,22 +213,22 @@
           }
 
           @if (cd.wakeUpByCourse.length === 0 && cd.comandasTomadas > 0) {
-            <p class="text-[10px] text-slate-400 italic text-center py-2">
+            <p class="text-xs text-fg-3 text-center py-2">
               Sin solicitudes de despertar
             </p>
           }
           @if (cd.comandasTomadas === 0) {
-            <p class="text-[10px] text-slate-400 italic text-center py-2">
+            <p class="text-xs text-fg-3 text-center py-2">
               Ninguna comanda registrada aún
             </p>
           }
 
           <!-- Inventory Tracker -->
-          <div class="mt-4 pt-4 border-t border-slate-100">
-            <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Inventario de Platos</h3>
+          <div class="mt-4 pt-4 border-t border-line">
+            <h3 class="text-[11px] font-bold text-fg-3 uppercase tracking-widest mb-3">Inventario de Platos</h3>
             @for (course of cd.courses; track course.slot) {
-              <div class="mb-4 bg-slate-50 border border-slate-150 p-3 rounded-2xl">
-                <p class="text-[9px] font-black text-slate-400 mb-2.5 uppercase tracking-wider">
+              <div class="mb-4 bg-panel-2 border border-line p-3 rounded-2xl">
+                <p class="text-[11px] font-bold text-fg-3 mb-2.5 uppercase tracking-wider">
                   {{ course.label }}
                 </p>
                 <div class="space-y-3">
@@ -243,13 +243,13 @@
                         
                         <div>
                           <div class="flex justify-between items-center mb-1 gap-2">
-                            <span class="text-[10px] text-slate-600 font-medium truncate flex-1">{{ item.name }} (Entrada)</span>
-                            <span class="text-[10px] font-bold font-mono shrink-0" 
-                                  [ngClass]="barData.isOut ? 'text-rose-600' : barData.isLow ? 'text-amber-600' : 'text-emerald-600'">
+                            <span class="text-xs text-fg-2 font-medium truncate flex-1">{{ item.name }} (Entrada)</span>
+                            <span class="text-xs font-bold font-mono shrink-0" 
+                                  [ngClass]="barData.isOut ? 'text-rose-700 dark:text-rose-300' : barData.isLow ? 'text-amber-700 dark:text-amber-300' : 'text-emerald-700 dark:text-emerald-300'">
                               {{ barData.remaining }}/{{ totalStock }}
                             </span>
                           </div>
-                          <div class="w-full h-1 bg-slate-200/60 rounded-full overflow-hidden">
+                          <div class="w-full h-1 bg-fg/10 rounded-full overflow-hidden">
                             <div class="h-full rounded-full transition-all duration-300"
                                  [ngClass]="barData.isOut ? 'bg-rose-500' : barData.isLow ? 'bg-amber-400' : 'bg-emerald-500'"
                                  [style.width]="(100 - barData.pct) + '%'">
@@ -270,13 +270,13 @@
                       
                       <div>
                         <div class="flex justify-between items-center mb-1 gap-2">
-                          <span class="text-[10px] text-slate-600 font-medium truncate flex-1">{{ item.name }}</span>
-                          <span class="text-[10px] font-bold font-mono shrink-0" 
-                                [ngClass]="barData.isOut ? 'text-rose-600' : barData.isLow ? 'text-amber-600' : 'text-emerald-600'">
+                          <span class="text-xs text-fg-2 font-medium truncate flex-1">{{ item.name }}</span>
+                          <span class="text-xs font-bold font-mono shrink-0" 
+                                [ngClass]="barData.isOut ? 'text-rose-700 dark:text-rose-300' : barData.isLow ? 'text-amber-700 dark:text-amber-300' : 'text-emerald-700 dark:text-emerald-300'">
                             {{ barData.remaining }}/{{ totalStock }}
                           </span>
                         </div>
-                        <div class="w-full h-1 bg-slate-200/60 rounded-full overflow-hidden">
+                        <div class="w-full h-1 bg-fg/10 rounded-full overflow-hidden">
                           <div class="h-full rounded-full transition-all duration-300"
                                [ngClass]="barData.isOut ? 'bg-rose-500' : barData.isLow ? 'bg-amber-400' : 'bg-emerald-500'"
                                [style.width]="(100 - barData.pct) + '%'">
@@ -290,13 +290,13 @@
                       
                       <div>
                         <div class="flex justify-between items-center mb-1 gap-2">
-                          <span class="text-[10px] text-slate-600 font-medium truncate flex-1">{{ item.name }}</span>
-                          <span class="text-[10px] font-bold font-mono shrink-0" 
-                                [ngClass]="barData.isOut ? 'text-rose-600' : barData.isLow ? 'text-amber-600' : 'text-emerald-600'">
+                          <span class="text-xs text-fg-2 font-medium truncate flex-1">{{ item.name }}</span>
+                          <span class="text-xs font-bold font-mono shrink-0" 
+                                [ngClass]="barData.isOut ? 'text-rose-700 dark:text-rose-300' : barData.isLow ? 'text-amber-700 dark:text-amber-300' : 'text-emerald-700 dark:text-emerald-300'">
                             {{ barData.remaining }}/{{ totalStock }}
                           </span>
                         </div>
-                        <div class="w-full h-1 bg-slate-200/60 rounded-full overflow-hidden">
+                        <div class="w-full h-1 bg-fg/10 rounded-full overflow-hidden">
                           <div class="h-full rounded-full transition-all duration-300"
                                [ngClass]="barData.isOut ? 'bg-rose-500' : barData.isLow ? 'bg-amber-400' : 'bg-emerald-500'"
                                [style.width]="(100 - barData.pct) + '%'">
@@ -312,13 +312,13 @@
 
           <!-- Unmet Demands (No Stock) -->
           @if (cd.sortedUnmet.length > 0) {
-            <div class="mt-4 pt-4 border-t border-slate-100">
-              <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Solicitudes No Satisfechas (Sin Stock)</h3>
+            <div class="mt-4 pt-4 border-t border-line">
+              <h3 class="text-[11px] font-bold text-fg-3 uppercase tracking-widest mb-3">Solicitudes No Satisfechas (Sin Stock)</h3>
               <div class="space-y-1.5">
                 @for (item of cd.sortedUnmet; track item.name) {
-                  <div class="flex items-center justify-between bg-rose-50/60 border border-rose-100 rounded-xl px-3 py-2">
-                    <span class="text-[10px] font-bold text-slate-700 truncate flex-1 pr-2">{{ item.name }}</span>
-                    <span class="text-[10px] font-black text-rose-700 bg-rose-100 px-2 py-0.5 rounded-md shrink-0">{{ item.count }}×</span>
+                  <div class="flex items-center justify-between bg-rose-500/10 border border-rose-500/25 rounded-xl px-3 py-2">
+                    <span class="text-xs font-bold text-fg-2 truncate flex-1 pr-2">{{ item.name }}</span>
+                    <span class="text-xs font-bold text-rose-700 dark:text-rose-300 bg-rose-500/15 px-2 py-0.5 rounded-md shrink-0">{{ item.count }}×</span>
                   </div>
                 }
               </div>

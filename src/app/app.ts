@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StoreService } from './store.service';
 import type { ServiceType } from '../domain/mealService';
@@ -9,7 +9,7 @@ import { StatsSidebar } from './components/stats-sidebar/stats-sidebar';
 import { PassengerModal } from './components/passenger-modal/passenger-modal';
 import { ComandaMode } from './components/comanda-mode/comanda-mode';
 
-import { LucideAngularModule, RotateCcw, FlaskConical, ChevronDown, ChefHat } from 'lucide-angular';
+import { LucideAngularModule, RotateCcw, FlaskConical, ChevronDown, ChefHat, ArrowRight, Sun, Moon } from 'lucide-angular';
 
 @Component({
   selector: 'app-root',
@@ -32,6 +32,24 @@ export class App {
   readonly FlaskConical = FlaskConical;
   readonly ChevronDown = ChevronDown;
   readonly ChefHat = ChefHat;
+  readonly ArrowRight = ArrowRight;
+  readonly Sun = Sun;
+  readonly Moon = Moon;
+
+  theme = signal<'light' | 'dark'>(
+    document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
+  );
+
+  toggleTheme() {
+    const next = this.theme() === 'dark' ? 'light' : 'dark';
+    this.theme.set(next);
+    document.documentElement.setAttribute('data-theme', next);
+    try {
+      localStorage.setItem('theme', next);
+    } catch {
+      /* storage unavailable: the choice lasts for this session */
+    }
+  }
 
   SERVICE_OPTIONS: { value: ServiceType; label: string }[] = [
     { value: 'INSIGNIA', label: 'Servicio Insignia' },

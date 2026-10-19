@@ -99,31 +99,31 @@ export class SeatMap {
   }
 
   getBgColor(seatId: string, element: AircraftElement): string {
-    if (this.isBlocked(element, seatId)) return 'bg-slate-100/50 border border-dashed border-slate-200 pointer-events-none opacity-40';
+    if (this.isBlocked(element, seatId)) return 'bg-fg/5 border border-dashed border-line-strong pointer-events-none opacity-40';
     const pax = this.getPassenger(seatId);
     if (pax) {
       if (pax.status === 'MAGN' || pax.status === 'M') return 'bg-gradient-to-br from-[#3c1053] to-[#ad5389] border border-purple-950 shadow-sm animate-glow-purple';
-      if (pax.status === 'DIAM' || pax.status === 'D') return 'bg-slate-900 border border-slate-950 shadow-sm';
-      if (pax.status === 'GOLD' || pax.status === 'G') return 'bg-gradient-to-br from-amber-400 to-amber-500 border border-amber-600/30 shadow-sm';
-      return 'bg-red-50/70 border border-red-100 shadow-sm';
+      if (pax.status === 'DIAM' || pax.status === 'D') return 'bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-600 dark:from-slate-100 dark:to-slate-300 dark:border-white/60';
+      if (pax.status === 'GOLD' || pax.status === 'G') return 'bg-gradient-to-br from-amber-400 to-amber-500 border border-amber-300/40';
+      return 'bg-panel-3 border border-line-strong';
     }
-    return 'bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50'; // Libre
+    return 'bg-transparent border border-line hover:border-line-strong'; // Libre
   }
 
   getTextColor(seatId: string, element: AircraftElement): string {
     if (this.isBlocked(element, seatId)) return 'text-transparent';
     const pax = this.getPassenger(seatId);
     if (pax) {
-      if (pax.status === 'GOLD' || pax.status === 'G') return 'text-amber-950';
-      if (pax.status === 'MAGN' || pax.status === 'M') return 'text-white font-extrabold';
-      if (pax.status !== 'DIAM' && pax.status !== 'D') return 'text-[#E20613] font-extrabold';
-      return 'text-white font-extrabold';
+      if (pax.status === 'GOLD' || pax.status === 'G') return 'text-amber-950 font-bold';
+      if (pax.status === 'MAGN' || pax.status === 'M') return 'text-white font-bold';
+      if (pax.status === 'DIAM' || pax.status === 'D') return 'text-white dark:text-slate-900 font-bold';
+      return 'text-fg font-bold';
     }
-    return 'text-slate-400 font-semibold'; // Libre
+    return 'text-fg-3 font-semibold'; // Libre
   }
 
   getRingClasses(seatId: string): string {
-    if (this.store.selectedSeat() === seatId) return 'ring-2 ring-[#E20613] ring-offset-2 scale-105 z-10';
+    if (this.store.selectedSeat() === seatId) return 'ring-2 ring-fg ring-offset-2 ring-offset-ink scale-105 z-10';
     if (this.hasNpsAlert(seatId)) return 'ring-2 ring-rose-500 animate-glow-rose z-10';
     if (this.isHighlighted(seatId)) return 'ring-2 ring-amber-500 animate-glow-gold z-10';
     return '';
@@ -170,6 +170,23 @@ export class SeatMap {
   isGold(seatId: string) {
     const pax = this.getPassenger(seatId);
     return pax?.status === 'GOLD' || pax?.status === 'G';
+  }
+
+  seatLabel(seatId: string, element: AircraftElement): string {
+    if (this.isBlocked(element, seatId)) return `Asiento ${seatId}, no disponible`;
+    const pax = this.getPassenger(seatId);
+    if (!pax) return `Asiento ${seatId}, libre`;
+    const parts = [`Asiento ${seatId}`, `${pax.firstName} ${pax.lastName}`];
+    if (this.isMagno(seatId)) parts.push('Magno');
+    if (this.isDiamond(seatId)) parts.push('Diamond');
+    if (this.isGold(seatId)) parts.push('Gold');
+    if (this.hasNpsAlert(seatId)) parts.push('alerta NPS pendiente');
+    if (this.isNpsRecovered(seatId)) parts.push('NPS atendido');
+    if (this.hasWheelchair(seatId)) parts.push('silla de ruedas');
+    if (this.hasPet(seatId)) parts.push('mascota');
+    if (this.hasMeal(seatId)) parts.push('comida especial');
+    if (this.hasMedicalLegal(seatId)) parts.push('requerimiento médico o legal');
+    return parts.join(', ');
   }
 
   selectSeat(seatId: string, element: AircraftElement) {

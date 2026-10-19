@@ -1,40 +1,35 @@
-<div class="h-screen flex flex-col bg-[#f8fafc] overflow-hidden">
-  <nav class="h-16 shrink-0 bg-white/80 backdrop-blur-md border-b border-slate-200/60 px-6 flex items-center justify-between z-30 sticky top-0">
+<div class="h-screen flex flex-col overflow-hidden">
+  <nav class="h-16 shrink-0 border-b border-line px-4 md:px-6 flex items-center justify-between z-30 bg-ink/60 backdrop-blur-xl">
     <div class="flex items-center gap-3">
-      <div class="bg-white border border-slate-200/80 p-1.5 rounded-xl shadow-sm flex items-center justify-center w-9 h-9">
-        <img src="avianca-symbol.png" alt="" aria-hidden="true" class="h-6 w-6 object-contain">
-      </div>
-      <div class="flex flex-col">
-        <h1 class="flex items-center gap-1.5 font-black text-slate-900 tracking-tight text-base leading-none">
-          <img src="avianca-wordmark.png" alt="Avianca" class="h-[18px] w-auto object-contain">
-          <span class="text-[#E20613] font-bold uppercase tracking-wider">SeatMap Pro</span>
-        </h1>
-        <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-1">Crew Operations</span>
-      </div>
+      <img src="avianca-symbol.png" alt="" aria-hidden="true" class="h-8 w-8 object-contain">
+      <h1 class="flex items-center gap-2 text-fg tracking-tight leading-none">
+        <img src="avianca-wordmark.png" alt="Avianca" class="h-[18px] w-auto object-contain">
+        <span class="font-display font-semibold text-base text-fg-2 border-l border-line-strong pl-2">SeatMap Pro</span>
+      </h1>
     </div>
 
     @if (store.manifest()) {
-      <div class="flex items-center gap-3 md:gap-5">
-        <!-- Info del vuelo -->
-        <div class="hidden md:flex flex-col items-end">
-          <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">
-            Vuelo Activo
-          </span>
-          <span class="text-xs font-bold text-slate-700">
-            {{ store.manifest()?.flightNumber }} · {{ store.manifest()?.origin }} → {{ store.manifest()?.destination }} · {{ store.manifest()?.departureTime }}
-          </span>
-        </div>
-
+      <div class="flex items-center gap-2 md:gap-3">
+        <button
+              type="button"
+              (click)="toggleTheme()"
+              class="size-11 inline-flex items-center justify-center rounded-full border border-line-strong text-fg-2 hover:bg-fg/5 transition-colors cursor-pointer"
+              [attr.aria-label]="theme() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+            >
+              <lucide-angular [img]="theme() === 'dark' ? Sun : Moon" size="18"></lucide-angular>
+            </button>
         <!-- Override de tipo de servicio -->
         <div class="relative flex items-center">
+          <label for="service-type" class="sr-only">Tipo de servicio</label>
           <select
+            id="service-type"
             [value]="store.serviceOverride() ?? store.manifest()?.serviceType"
             (change)="onServiceChange($event)"
-            class="appearance-none pl-3 pr-8 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer outline-none focus:ring-2 focus:ring-[#E20613]/20"
+            class="appearance-none h-11 pl-4 pr-9 rounded-full text-sm font-semibold border transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand-text bg-panel-2"
             [ngClass]="{
-              'bg-amber-50 border-amber-200 text-amber-800': store.activeServiceType() === 'INSIGNIA',
-              'bg-blue-50 border-blue-200 text-blue-800': store.activeServiceType() !== 'INSIGNIA',
-              'ring-2 ring-[#E20613]/30': store.serviceOverride()
+              'border-amber-500/40 text-amber-700 dark:text-amber-300': store.activeServiceType() === 'INSIGNIA',
+              'border-sky-500/40 text-sky-700 dark:text-sky-300': store.activeServiceType() !== 'INSIGNIA',
+              'ring-2 ring-brand/50': store.serviceOverride()
             }"
           >
             @for (o of SERVICE_OPTIONS; track o.value) {
@@ -43,41 +38,50 @@
           </select>
           <lucide-angular
             [img]="ChevronDown"
-            size="12"
-            class="absolute right-3 pointer-events-none"
-            [ngClass]="store.activeServiceType() === 'INSIGNIA' ? 'text-amber-600' : 'text-blue-600'"
+            size="14"
+            class="absolute right-3.5 pointer-events-none text-fg-3"
           ></lucide-angular>
           @if (store.serviceOverride()) {
-            <span class="ml-1.5 text-[8px] font-black text-[#E20613] bg-red-50 border border-red-200/50 px-1.5 py-0.5 rounded-md uppercase tracking-wider">override</span>
+            <span class="ml-2 text-[11px] font-semibold text-brand-text border border-brand/40 px-2 py-1 rounded-full uppercase tracking-wider">override</span>
           }
         </div>
 
-        <!-- Botón Comanda con estado de color -->
+        <!-- Botón Comanda: blanco en reposo, color según estado -->
         <button
           (click)="store.openComanda()"
-          class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-sm hover:shadow-md active:scale-95"
+          class="flex items-center gap-2 h-11 px-5 rounded-full text-sm font-semibold transition-colors cursor-pointer active:scale-[0.97]"
           [ngClass]="{
-            'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 hover:to-teal-700 shadow-emerald-600/10': store.comandaStatus() === 'complete',
-            'bg-gradient-to-r from-[#E20613] to-red-500 text-white hover:from-red-700 hover:to-red-600 shadow-red-500/10': store.comandaStatus() === 'in-progress',
-            'bg-white text-[#E20613] border border-red-200 hover:bg-red-50/50': store.comandaStatus() === 'empty'
+            'bg-emerald-500 text-emerald-950 hover:bg-emerald-400': store.comandaStatus() === 'complete',
+            'bg-brand text-white hover:bg-brand-hi': store.comandaStatus() === 'in-progress',
+            'bg-fg text-ink hover:bg-white': store.comandaStatus() === 'empty'
           }"
         >
-          <lucide-angular [img]="ChefHat" size="14"></lucide-angular>
+          <lucide-angular [img]="ChefHat" size="16"></lucide-angular>
           <span class="hidden sm:inline">Comanda</span>
         </button>
 
         <button
           (click)="store.reset()"
-          class="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-xl text-xs font-bold transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-sm active:scale-95"
+          class="flex items-center gap-2 h-11 px-4 border border-line-strong hover:bg-fg/5 text-fg-2 rounded-full text-sm font-semibold transition-colors cursor-pointer active:scale-[0.97]"
         >
-          <lucide-angular [img]="RotateCcw" size="14"></lucide-angular>
-          <span class="hidden sm:inline">Cambiar Vuelo</span>
+          <lucide-angular [img]="RotateCcw" size="16"></lucide-angular>
+          <span class="hidden sm:inline">Cambiar vuelo</span>
         </button>
       </div>
     } @else {
-      <div class="flex items-center gap-2 text-amber-700 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200/50">
-        <lucide-angular [img]="FlaskConical" size="12"></lucide-angular>
-        <span class="text-[9px] font-black uppercase tracking-wider">Modo Demo</span>
+      <div class="flex items-center gap-2 md:gap-3">
+        <button
+              type="button"
+              (click)="toggleTheme()"
+              class="size-11 inline-flex items-center justify-center rounded-full border border-line-strong text-fg-2 hover:bg-fg/5 transition-colors cursor-pointer"
+              [attr.aria-label]="theme() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+            >
+              <lucide-angular [img]="theme() === 'dark' ? Sun : Moon" size="18"></lucide-angular>
+            </button>
+        <div class="flex items-center gap-2 text-amber-700 dark:text-amber-300 border border-amber-500/30 px-3 h-8 rounded-full">
+          <lucide-angular [img]="FlaskConical" size="14"></lucide-angular>
+          <span class="text-[11px] font-semibold uppercase tracking-wider">Modo demo</span>
+        </div>
       </div>
     }
   </nav>
@@ -90,22 +94,49 @@
         </div>
       </div>
     } @else {
-      <div class="flex-1 min-h-0 flex flex-col md:flex-row md:h-full md:overflow-hidden">
-        <div class="flex-1 min-h-0 flex flex-col overflow-y-auto overflow-x-auto md:flex-row md:overflow-hidden md:contents">
-          <app-seat-map></app-seat-map>
-          <app-stats-sidebar></app-stats-sidebar>
-        </div>
-        <app-passenger-modal></app-passenger-modal>
-        <app-comanda-mode></app-comanda-mode>
+      @if (store.manifest(); as m) {
+        <!-- Franja de vuelo: la ruta es el dato que se lee a distancia -->
+        <section class="shrink-0 px-4 md:px-8 pt-5 pb-4 flex flex-wrap items-end justify-between gap-x-10 gap-y-3" aria-label="Vuelo activo">
+          <div class="flex items-end gap-5">
+            <div>
+              <p class="text-fg-3 text-xs font-medium">Origen</p>
+              <p class="font-display text-5xl md:text-6xl font-medium tracking-tight leading-none text-fg">{{ m.origin }}</p>
+            </div>
+            <lucide-angular [img]="ArrowRight" size="28" class="text-brand-text mb-2 shrink-0" aria-hidden="true"></lucide-angular>
+            <div>
+              <p class="text-fg-3 text-xs font-medium">Destino</p>
+              <p class="font-display text-5xl md:text-6xl font-medium tracking-tight leading-none text-fg">{{ m.destination }}</p>
+            </div>
+          </div>
+          <dl class="flex gap-x-8 gap-y-2 flex-wrap text-sm pb-1">
+            <div>
+              <dt class="text-fg-3 text-xs">Vuelo</dt>
+              <dd class="font-semibold text-fg">{{ m.flightNumber }}</dd>
+            </div>
+            <div>
+              <dt class="text-fg-3 text-xs">Salida</dt>
+              <dd class="font-semibold text-fg">{{ m.departureTime }}</dd>
+            </div>
+            <div>
+              <dt class="text-fg-3 text-xs">Fecha</dt>
+              <dd class="font-semibold text-fg">{{ m.date }}</dd>
+            </div>
+          </dl>
+        </section>
+      }
+
+      <div class="flex-1 min-h-0 grid grid-cols-1 grid-rows-[auto_auto] content-start lg:grid-rows-1 lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] gap-4 px-4 md:px-8 pb-4 overflow-y-auto lg:overflow-hidden">
+        <app-seat-map class="block lg:min-h-0 lg:overflow-y-auto scrollbar-hide"></app-seat-map>
+        <app-stats-sidebar class="block lg:min-h-0"></app-stats-sidebar>
       </div>
+      <app-passenger-modal></app-passenger-modal>
+      <app-comanda-mode></app-comanda-mode>
     }
   </main>
 
   @if (!store.manifest()) {
-    <footer class="md:hidden h-6 bg-slate-900 text-white flex items-center justify-center">
-      <p class="text-[8px] font-black uppercase tracking-[0.3em] opacity-50">
-        Modo Demo · iPad/Mobile Ready
-      </p>
+    <footer class="md:hidden h-8 flex items-center justify-center">
+      <p class="text-[11px] font-medium text-fg-3">Modo demo · iPad/Mobile</p>
     </footer>
   }
 </div>

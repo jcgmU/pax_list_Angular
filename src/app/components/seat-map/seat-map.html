@@ -1,176 +1,171 @@
 @if (store.manifest(); as manifest) {
-  <div class="flex flex-col md:flex-row w-full md:h-full gap-6 fade-in md:overflow-hidden bg-[#f8fafc]">
-    <!-- Flight Header (Mobile only) -->
-    <div class="md:hidden bg-white border-b border-slate-200/60 sticky top-0 z-20">
-      <div class="px-4 py-3 flex justify-between items-center">
-        <div>
-          <h2 class="font-black text-[#E20613] tracking-tight italic">{{ manifest.flightNumber }}</h2>
-          <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">{{ config()?.id }}</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <p class="text-xs font-bold text-slate-700">{{ manifest.date }}</p>
-          <button
-            (click)="toggleSearch()"
-            class="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors"
-          >
-            <lucide-angular [img]="Search" size="16"></lucide-angular>
-          </button>
-        </div>
+  <div class="flex flex-col w-full gap-4 pb-24 lg:pb-8">
+    <!-- Buscar (solo móvil; en escritorio vive en el panel lateral) -->
+    <div class="lg:hidden">
+      <div class="flex items-center justify-between gap-3">
+        <p class="text-fg-3 text-sm">{{ config()?.id }}</p>
+        <button
+          (click)="toggleSearch()"
+          aria-label="Buscar pasajero o asiento"
+          class="size-11 inline-flex items-center justify-center rounded-full border border-line-strong text-fg-2 hover:bg-fg/5 transition-colors"
+        >
+          <lucide-angular [img]="Search" size="18"></lucide-angular>
+        </button>
       </div>
       @if (showSearch) {
-        <div class="px-4 pb-3 border-t border-slate-100">
+        <div class="pt-2">
           <app-search-bar></app-search-bar>
         </div>
       }
     </div>
 
-    <!-- Map Scroll Area -->
-    <div class="flex-1 md:overflow-y-auto overflow-x-auto pb-24 md:pb-8 scrollbar-hide">
-      <div class="min-w-max md:min-w-0 flex flex-col items-center p-8 bg-[#f8fafc]">
-        
-        <!-- Fuselage Container: curve nose rounded-t-[140px] and body shadow -->
-        <div class="w-full max-w-2xl bg-white rounded-t-[140px] rounded-b-[40px] shadow-2xl border-x-4 border-t-4 border-b border-slate-300/80 p-8 pt-12 flex flex-col gap-6 relative">
-          
-          <!-- Cockpit Window Design at the Top -->
-          <div class="w-full flex flex-col items-center border-b border-slate-100 pb-8 mb-2">
-            <div class="w-24 h-9 bg-slate-100/80 rounded-t-full border-t border-x border-slate-200/80 flex items-center justify-center shadow-inner">
-              <span class="text-[9px] font-black text-slate-400 tracking-widest uppercase">COCKPIT</span>
+    <!-- Leyenda: el color nunca es el único canal -->
+    <ul class="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-fg-2 justify-center" aria-label="Leyenda del mapa">
+      <li class="flex items-center gap-2"><span class="size-4 rounded-md border border-line-strong"></span>Libre</li>
+      <li class="flex items-center gap-2"><span class="size-4 rounded-md bg-panel-3 border border-line-strong"></span>Ocupado</li>
+      <li class="flex items-center gap-2"><span class="size-4 rounded-md bg-gradient-to-br from-[#5b1a78] to-[#c05f9a]"></span>Magno</li>
+      <li class="flex items-center gap-2"><span class="size-4 rounded-md bg-gradient-to-br from-slate-800 to-slate-900 dark:from-slate-100 dark:to-slate-300"></span>Diamond</li>
+      <li class="flex items-center gap-2"><span class="size-4 rounded-md bg-gradient-to-br from-amber-400 to-amber-500"></span>Gold</li>
+      <li class="flex items-center gap-2"><span class="size-4 rounded-full bg-rose-600 inline-flex items-center justify-center"><lucide-angular [img]="AlertTriangle" size="10" strokeWidth="3" class="text-white"></lucide-angular></span>Alerta NPS</li>
+    </ul>
+
+    <div class="overflow-x-auto scrollbar-hide">
+      <div class="min-w-max lg:min-w-0 flex flex-col items-center px-10 pt-2">
+
+        <!-- Fuselaje: un solo brillo de marca en la proa; el borde declara la elevación -->
+        <div class="w-full max-w-xl rounded-t-[160px] rounded-b-[48px] border border-line-strong p-8 pt-14 flex flex-col gap-6 relative fuselage">
+
+          <!-- Cabina de mando -->
+          <div class="w-full flex flex-col items-center border-b border-line pb-8 mb-2">
+            <div class="w-28 h-10 rounded-t-full border-t border-x border-line-strong flex items-center justify-center bg-fg/10">
+              <span class="text-[11px] font-semibold text-fg-3 tracking-widest uppercase">Cockpit</span>
             </div>
             <div class="flex gap-1.5 mt-1.5">
-              <div class="w-7 h-2.5 bg-slate-800 rounded-tl-sm rotate-[-12deg] shadow-sm"></div>
-              <div class="w-7 h-2.5 bg-slate-800 rounded-tr-sm rotate-[12deg] shadow-sm"></div>
+              <div class="w-8 h-2.5 bg-fg/15 rounded-tl-sm rotate-[-12deg]"></div>
+              <div class="w-8 h-2.5 bg-fg/15 rounded-tr-sm rotate-[12deg]"></div>
             </div>
           </div>
 
           @for (element of config()?.elements; track $index) {
             @if (element.type === 'facility') {
               <div class="relative w-full py-5 flex flex-col items-center">
-                <!-- Exit Doors indicators -->
-                <div class="absolute left-[-36px] top-1/2 -translate-y-1/2 flex items-center gap-1">
-                  <div class="bg-red-50 text-[#E20613] border border-red-200/50 px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider scale-75 select-none shadow-sm">Exit</div>
-                  <div class="w-2.5 h-12 bg-gradient-to-r from-red-500 to-[#E20613] rounded-r-lg shadow-md"></div>
+                <!-- Salidas -->
+                <div class="absolute left-[-52px] top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                  <span class="text-[11px] font-semibold text-brand-text uppercase tracking-wider select-none">Exit</span>
+                  <div class="w-1.5 h-12 bg-brand rounded-full"></div>
                 </div>
-                <div class="absolute right-[-36px] top-1/2 -translate-y-1/2 flex items-center gap-1">
-                  <div class="w-2.5 h-12 bg-gradient-to-l from-red-500 to-[#E20613] rounded-l-lg shadow-md"></div>
-                  <div class="bg-red-50 text-[#E20613] border border-red-200/50 px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider scale-75 select-none shadow-sm">Exit</div>
+                <div class="absolute right-[-52px] top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                  <div class="w-1.5 h-12 bg-brand rounded-full"></div>
+                  <span class="text-[11px] font-semibold text-brand-text uppercase tracking-wider select-none">Exit</span>
                 </div>
-                
-                <!-- Central Facility Container -->
+
                 @if (element.components && element.components.length > 0) {
-                  <div class="w-full max-w-md bg-slate-50 border border-slate-200/60 rounded-2xl p-3 flex justify-around items-center shadow-inner">
+                  <div class="w-full max-w-md bg-fg/[0.06] border border-line rounded-2xl p-3 flex justify-around items-center gap-2">
                     @for (comp of element.components; track $index) {
-                      <div class="flex flex-col items-center gap-1.5 text-slate-500 bg-white border border-slate-100/80 px-4 py-2 rounded-xl shadow-sm min-w-[70px]">
-                        <lucide-angular [img]="getIconForComponent(comp.icon)" size="15" class="text-slate-400"></lucide-angular>
-                        <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">{{ comp.label }}</span>
+                      <div class="flex flex-col items-center gap-1.5 text-fg-3 px-4 py-2 min-w-[76px]">
+                        <lucide-angular [img]="getIconForComponent(comp.icon)" size="18" class="text-fg-2"></lucide-angular>
+                        <span class="text-[11px] font-medium uppercase tracking-wider">{{ comp.label }}</span>
                       </div>
                     }
                   </div>
                 }
-                
+
                 @if (element.doors.includes('OWE') && (!element.components || element.components.length === 0)) {
-                  <div class="w-full border-t border-dashed border-red-200/60 my-2"></div>
+                  <div class="w-full border-t border-dashed border-brand/30 my-2"></div>
                 }
               </div>
             } @else {
-              <!-- Cabin Rendering -->
+              <!-- Cabina -->
               <div class="w-full flex flex-col gap-2">
-                <div class="text-[10px] font-black text-slate-400/85 uppercase tracking-[0.2em] mb-2 text-center flex items-center justify-center gap-2">
-                  <span class="h-px w-8 bg-slate-200"></span>
+                <div class="font-display text-sm font-medium text-fg-2 mb-2 text-center flex items-center justify-center gap-3">
+                  <span class="h-px w-10 bg-line-strong"></span>
                   Clase {{ element.class }}
-                  <span class="h-px w-8 bg-slate-200"></span>
+                  <span class="h-px w-10 bg-line-strong"></span>
                 </div>
-                
-                <!-- Seat Letters Columns Header -->
-                <div class="flex justify-center items-center gap-1.5 h-6 mb-1">
-                  <div class="w-7"></div> <!-- Row Number spacer -->
+
+                <!-- Letras de columna -->
+                <div class="flex justify-center items-center gap-2 h-6 mb-1">
+                  <div class="w-7"></div>
                   @for (col of element.layout; track $index) {
                     @if (isAisle(col)) {
                       <div class="w-6"></div>
                     } @else {
-                      <div class="w-10 text-center text-[9px] font-black text-slate-400 uppercase tracking-widest">{{ col }}</div>
+                      <div class="w-11 text-center text-xs font-semibold text-fg-3">{{ col }}</div>
                     }
                   }
                 </div>
 
                 @for (rowNum of element.rows; track rowNum) {
-                  <div class="flex justify-center items-center gap-1.5 h-11">
-                    <!-- Row Number Label -->
-                    <div class="w-7 text-[10px] font-black text-slate-400 text-center">{{ rowNum }}</div>
-                    
+                  <div class="flex justify-center items-center gap-2 h-12">
+                    <div class="w-7 text-xs font-semibold text-fg-3 text-center">{{ rowNum }}</div>
+
                     @for (col of element.layout; track $index) {
                       @if (isAisle(col)) {
-                        <!-- Visual Corridor Representation -->
-                        <div class="w-6 h-full flex flex-col justify-between items-center py-0.5 opacity-25">
-                          <span class="w-[1px] h-2 bg-slate-300"></span>
-                          <span class="w-[1px] h-2 bg-slate-300"></span>
-                          <span class="w-[1px] h-2 bg-slate-300"></span>
-                        </div>
+                        <div class="w-6 h-full"></div>
                       } @else {
                         @let seatId = rowNum + col;
-                        <button 
+                        <button
                           (click)="selectSeat(seatId, element)"
-                          class="relative w-10 h-10 rounded-xl transition-all duration-300 hover:scale-[1.03] active:scale-95 flex flex-col items-center justify-center text-[10px] font-extrabold shadow-sm border cursor-pointer group"
+                          [attr.aria-label]="seatLabel(seatId, element)"
+                          [attr.aria-pressed]="store.selectedSeat() === seatId"
+                          class="relative size-11 rounded-xl transition-[background-color,border-color,transform] duration-200 hover:scale-[1.04] active:scale-95 flex items-center justify-center text-xs cursor-pointer"
                           [ngClass]="[getBgColor(seatId, element), getTextColor(seatId, element), getRingClasses(seatId)]"
                         >
-                          <!-- Headrest styling bar inside seats -->
-                          <span class="w-6 h-1 rounded-full bg-black/10 absolute top-1 block group-hover:bg-black/15"
-                                [ngClass]="{'bg-white/20 group-hover:bg-white/35': isMagno(seatId) || isDiamond(seatId), 'bg-amber-900/10 group-hover:bg-amber-900/20': isGold(seatId)}"></span>
-                          
-                          <span class="mt-1">{{ seatId }}</span>
+                          <span>{{ seatId }}</span>
 
-                          <!-- Badges Layout (Top Right) -->
-                          <div class="absolute -top-1.5 -right-1.5 flex flex-col gap-0.5 z-10">
+                          <!-- Insignias (arriba a la derecha) -->
+                          <div class="absolute -top-2 -right-2 flex flex-col gap-0.5 z-10">
                             @if (isMagno(seatId)) {
-                              <div class="w-4 h-4 rounded-full bg-gradient-to-br from-[#3c1053] to-[#ad5389] border border-purple-900 flex items-center justify-center text-white shadow-sm ring-1 ring-white/20">
-                                <lucide-angular [img]="Crown" size="8" strokeWidth="3" class="fill-white"></lucide-angular>
+                              <div class="size-5 rounded-full bg-gradient-to-br from-[#3c1053] to-[#ad5389] border border-ink flex items-center justify-center text-white">
+                                <lucide-angular [img]="Crown" size="11" strokeWidth="2.5" class="fill-white"></lucide-angular>
                               </div>
                             }
                             @if (isDiamond(seatId)) {
-                              <div class="w-4 h-4 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-white shadow-sm ring-1 ring-white/20">
-                                <lucide-angular [img]="Star" size="8" strokeWidth="3" class="fill-white"></lucide-angular>
+                              <div class="size-5 rounded-full bg-slate-900 border border-slate-300 flex items-center justify-center text-white">
+                                <lucide-angular [img]="Star" size="11" strokeWidth="2.5" class="fill-white"></lucide-angular>
                               </div>
                             }
                             @if (isGold(seatId)) {
-                              <div class="w-4 h-4 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 border border-amber-600/30 flex items-center justify-center text-amber-950 shadow-sm ring-1 ring-white/40">
-                                <lucide-angular [img]="Star" size="8" strokeWidth="3" class="fill-amber-950"></lucide-angular>
+                              <div class="size-5 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 border border-ink flex items-center justify-center text-amber-950">
+                                <lucide-angular [img]="Star" size="11" strokeWidth="2.5" class="fill-amber-950"></lucide-angular>
                               </div>
                             }
                             @if (hasNpsAlert(seatId)) {
-                              <div class="w-4 h-4 rounded-full bg-rose-600 border border-white flex items-center justify-center text-white shadow-sm animate-pulse">
-                                <lucide-angular [img]="AlertTriangle" size="8" strokeWidth="3"></lucide-angular>
+                              <div class="size-5 rounded-full bg-rose-600 border border-ink flex items-center justify-center text-white">
+                                <lucide-angular [img]="AlertTriangle" size="11" strokeWidth="2.5"></lucide-angular>
                               </div>
                             }
                             @if (isNpsRecovered(seatId)) {
-                              <div class="w-4 h-4 rounded-full bg-teal-500 border border-white flex items-center justify-center text-white shadow-sm animate-in zoom-in duration-200">
-                                <lucide-angular [img]="CheckCircle2" size="8" strokeWidth="3"></lucide-angular>
+                              <div class="size-5 rounded-full bg-teal-500 border border-ink flex items-center justify-center text-white">
+                                <lucide-angular [img]="CheckCircle2" size="11" strokeWidth="2.5"></lucide-angular>
                               </div>
                             }
                             @if (hasWheelchair(seatId)) {
-                              <div class="w-4 h-4 rounded-full bg-blue-500 border border-white flex items-center justify-center text-white shadow-sm">
-                                <lucide-angular [img]="Accessibility" size="8" strokeWidth="3"></lucide-angular>
+                              <div class="size-5 rounded-full bg-blue-500 border border-ink flex items-center justify-center text-white">
+                                <lucide-angular [img]="Accessibility" size="11" strokeWidth="2.5"></lucide-angular>
                               </div>
                             }
                             @if (hasPet(seatId)) {
-                              <div class="w-4 h-4 rounded-full bg-orange-500 border border-white flex items-center justify-center text-white shadow-sm">
-                                <lucide-angular [img]="Dog" size="8" strokeWidth="3"></lucide-angular>
+                              <div class="size-5 rounded-full bg-orange-500 border border-ink flex items-center justify-center text-white">
+                                <lucide-angular [img]="Dog" size="11" strokeWidth="2.5"></lucide-angular>
                               </div>
                             }
                             @if (hasMeal(seatId)) {
-                              <div class="w-4 h-4 rounded-full bg-green-500 border border-white flex items-center justify-center text-white shadow-sm">
-                                <lucide-angular [img]="Utensils" size="8" strokeWidth="3"></lucide-angular>
+                              <div class="size-5 rounded-full bg-green-500 border border-ink flex items-center justify-center text-green-950">
+                                <lucide-angular [img]="Utensils" size="11" strokeWidth="2.5"></lucide-angular>
                               </div>
                             }
                             @if (hasMedicalLegal(seatId)) {
-                              <div class="w-4 h-4 rounded-full bg-rose-600 border border-white flex items-center justify-center text-white shadow-sm">
-                                <lucide-angular [img]="AlertCircle" size="8" strokeWidth="3"></lucide-angular>
+                              <div class="size-5 rounded-full bg-rose-600 border border-ink flex items-center justify-center text-white">
+                                <lucide-angular [img]="AlertCircle" size="11" strokeWidth="2.5"></lucide-angular>
                               </div>
                             }
                           </div>
 
-                          <!-- Badge comanda completa (Bottom Left) -->
+                          <!-- Comanda completa (abajo a la izquierda) -->
                           @if (hasCompleteOrder(seatId)) {
-                            <div class="absolute -bottom-1.5 -left-1.5 w-4 h-4 rounded-full bg-green-500 border border-white flex items-center justify-center text-white shadow-sm">
-                              <lucide-angular [img]="CheckCircle2" size="8" strokeWidth="3"></lucide-angular>
+                            <div class="absolute -bottom-2 -left-2 size-5 rounded-full bg-green-500 border border-ink flex items-center justify-center text-green-950">
+                              <lucide-angular [img]="CheckCircle2" size="11" strokeWidth="2.5"></lucide-angular>
                             </div>
                           }
                         </button>
