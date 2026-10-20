@@ -3,9 +3,17 @@ import type { FlightManifest, ParsedPassenger } from '../infrastructure/mockData
 import { AIRCRAFT_CONFIGS } from '../domain/aircraftConfigs';
 import { FLIGHT_CODES } from '../domain/flightCodes';
 import { getAircraftConfigKey } from '../domain/aircraftMatch';
-import { countEmptySeats, countSSR, countMeals } from '../domain/flightStats';
-import type { ServiceType, MealSlot, CrewZone } from '../domain/mealService';
-import { deriveMealSlots, seatZone } from '../domain/mealService';
+import {
+  countEmptySeats,
+  countSSR,
+  countMeals,
+  seatsWithInfant,
+  seatsWithAnySsr,
+  seatsWithMeal,
+  seatsWithCode
+} from '../domain/flightStats';
+import type { ServiceType, MealSlot, CrewZone, StockPool } from '../domain/mealService';
+import { deriveMealSlots, seatZone, resolveStockPool, calculateRemaining } from '../domain/mealService';
 import { getCabinClass } from '../domain/cabinLookup';
 import type { ComfortKitProfile, ComfortKitSizes } from '../domain/comfortKit';
 import { deriveTravelerId } from '../domain/comfortKit';
@@ -21,6 +29,13 @@ export interface CourseSelection {
 
 export type PassengerOrder = Partial<Record<MealSlot, CourseSelection>>;
 
+export type MapLens =
+  | { kind: 'occupancy' }
+  | { kind: 'infants' }
+  | { kind: 'ssr' }
+  | { kind: 'meals' }
+  | { kind: 'code'; code: string };
+
 @Injectable({
   providedIn: 'root'
 })
@@ -34,8 +49,54 @@ export class StoreService {
   unavailable = signal<Record<string, boolean>>({});
   crewZone = signal<CrewZone | null>(null);
   comandaOpen = signal<boolean>(false);
+  mapLens = signal<MapLens | null>(null);
   // Perfiles de talla del Kit de Confort, persistidos entre vuelos por pasajero.
   comfortKitProfiles = signal<Record<string, ComfortKitProfile>>(loadComfortKitProfiles());
+
+  // Compatibilidad hacia atrás obligatoria
+  showOccupancy = computed(() => this.mapLens()?.kind === 'occupancy');
+
+  lensSeats = computed<Set<string> | null>(() => {
+    const lens = this.mapLens();
+    const man = this.manifest();
+    if (!lens || !man || lens.kind === 'occupancy') return null;
+    const pax = man.passengers;
+    switch (lens.kind) {
+      case 'infants':
+        return seatsWithInfant(pax);
+      case 'ssr':
+        return seatsWithAnySsr(pax);
+      case 'meals':
+        return seatsWithMeal(pax, Object.keys(FLIGHT_CODES.MEALS));
+      case 'code':
+        return seatsWithCode(pax, lens.code);
+    }
+  });
+
+  lensLabel = computed<string | null>(() => {
+    const lens = this.mapLens();
+    if (!lens) return null;
+    switch (lens.kind) {
+      case 'occupancy':
+        return 'Sillas vacías';
+      case 'infants':
+        return 'Infantes (INF)';
+      case 'ssr':
+        return 'Servicios SSR';
+      case 'meals':
+        return 'Comidas';
+      case 'code': {
+        const desc = (FLIGHT_CODES.MEALS as Record<string, string>)[lens.code]
+          || (FLIGHT_CODES.MEDICAL as Record<string, string>)[lens.code]
+          || (FLIGHT_CODES.LEGAL as Record<string, string>)[lens.code]
+          || (FLIGHT_CODES.ASSISTANCE as Record<string, string>)[lens.code]
+          || (FLIGHT_CODES.ANIMALS as Record<string, string>)[lens.code]
+          || (FLIGHT_CODES.BATTERIES as Record<string, string>)[lens.code]
+          || (FLIGHT_CODES.STATUS as Record<string, string>)[lens.code];
+        return desc ? `${lens.code} · ${desc}` : lens.code;
+      }
+    }
+  });
 
   // Computed properties replacing 'get' methods
   activeServiceType = computed(() => {
@@ -103,6 +164,26 @@ export class StoreService {
     this.unavailable.set({});
     this.crewZone.set(null);
     this.comandaOpen.set(false);
+    this.mapLens.set(null);
+  }
+
+  toggleMapLens(lens: MapLens) {
+    const current = this.mapLens();
+    if (!current) {
+      this.mapLens.set(lens);
+    } else if (current.kind === lens.kind && (lens.kind !== 'code' || (current.kind === 'code' && current.code === lens.code))) {
+      this.mapLens.set(null);
+    } else {
+      this.mapLens.set(lens);
+    }
+  }
+
+  clearMapLens() {
+    this.mapLens.set(null);
+  }
+
+  toggleOccupancy() {
+    this.toggleMapLens({ kind: 'occupancy' });
   }
 
   setSelectedSeat(seat: string | null) {
@@ -192,6 +273,31 @@ export class StoreService {
 
   getPassengerBySeat(seat: string): ParsedPassenger | undefined {
     return this.manifest()?.passengers.find((p) => p.seat === seat);
+  }
+
+  getRemainingForItem(
+    slot: MealSlot,
+    kind: 'plato' | 'entrada',
+    itemId: string,
+    stock: number,
+    passengerSeat?: string
+  ): number {
+    const man = this.manifest();
+    if (!man) return stock;
+    const srvType = this.activeServiceType();
+    if (!srvType) return stock;
+
+    const pool = resolveStockPool(srvType, this.crewZone(), passengerSeat);
+    return calculateRemaining({
+      flightNumber: man.flightNumber,
+      slot,
+      kind,
+      itemId,
+      stock,
+      pool,
+      orders: this.orders(),
+      unavailable: this.unavailable(),
+    });
   }
 
   getOrder(seat: string): PassengerOrder | undefined {

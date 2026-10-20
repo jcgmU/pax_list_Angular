@@ -73,10 +73,64 @@ const AMERICAS_PLATOS: Record<MealSlot, MenuItem[]> = {
 // ─── Zonas de tripulación ─────────────────────────────────────────────────────
 
 export type CrewZone = 'A-D' | 'E-K';
+export type StockPool = 'all' | CrewZone;
 
 export function seatZone(seat: string): CrewZone {
   const letter = seat.replace(/[0-9]/g, '').toUpperCase();
   return letter <= 'D' ? 'A-D' : 'E-K';
+}
+
+/**
+ * Determina la bolsa de inventario para un servicio según las reglas del negocio:
+ * - AMERICAS: inventario común para toda la cabina.
+ * - INSIGNIA con pasillo activo (crewZone != null): la bolsa del pasillo en servicio.
+ * - INSIGNIA sin pasillo activo: la bolsa correspondiente al asiento evaluado.
+ */
+export function resolveStockPool(
+  serviceType: ServiceType,
+  crewZone: CrewZone | null,
+  seat?: string
+): StockPool {
+  if (serviceType === 'AMERICAS') return 'all';
+  if (crewZone !== null) return crewZone;
+  if (seat) return seatZone(seat);
+  return 'all';
+}
+
+/**
+ * Cálculo puro de stock restante para un ítem de comida.
+ * Solo descuenta órdenes de pasajeros no marcados como unavailable.
+ */
+export function calculateRemaining(params: {
+  flightNumber: string;
+  slot: MealSlot;
+  kind: 'plato' | 'entrada';
+  itemId: string;
+  stock: number;
+  pool: StockPool;
+  orders: Record<string, Partial<Record<MealSlot, { platoFuerteId?: string; entradaId?: string }>>>;
+  unavailable?: Record<string, boolean>;
+}): number {
+  const { flightNumber, slot, kind, itemId, stock, pool, orders, unavailable = {} } = params;
+  const prefix = `${flightNumber}::`;
+
+  const consumed = Object.entries(orders)
+    .filter(([key]) => key.startsWith(prefix))
+    .filter(([key]) => {
+      // Pasajeros marcados como no disponibles no consumen comida del catering
+      if (unavailable[key] === true) return false;
+      if (pool === 'all') return true;
+      const seat = key.slice(prefix.length);
+      return seatZone(seat) === pool;
+    })
+    .filter(([_, orderEntry]) => {
+      const course = orderEntry[slot];
+      return kind === 'plato'
+        ? course?.platoFuerteId === itemId
+        : course?.entradaId === itemId;
+    }).length;
+
+  return Math.max(0, stock - consumed);
 }
 
 // ─── Lógica de derivación ─────────────────────────────────────────────────────
