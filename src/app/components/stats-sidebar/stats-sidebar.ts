@@ -1,10 +1,10 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, effect, DestroyRef, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StoreService, MapLens } from '../../store.service';
 import { SearchBar } from '../search-bar/search-bar';
 import { 
   LucideAngularModule, 
-  Users, Utensils, Accessibility, Baby, BarChart2, ChevronDown, 
+  Users, Utensils, Accessibility, Baby, BarChart2, ChevronDown, ChevronUp,
   Star, Diamond, ChefHat, Bell, CheckCircle2, Crown
 } from 'lucide-angular';
 import { ParsedPassenger } from '../../../infrastructure/mockData';
@@ -27,6 +27,7 @@ export class StatsSidebar {
   readonly Baby = Baby;
   readonly BarChart2 = BarChart2;
   readonly ChevronDown = ChevronDown;
+  readonly ChevronUp = ChevronUp;
   readonly Star = Star;
   readonly Diamond = Diamond;
   readonly ChefHat = ChefHat;
@@ -34,11 +35,51 @@ export class StatsSidebar {
   readonly CheckCircle2 = CheckCircle2;
   readonly Crown = Crown;
 
+  private destroyRef = inject(DestroyRef);
+
+  @ViewChild('sheetHeaderButton') sheetHeaderButton?: ElementRef<HTMLButtonElement>;
+
+  isMobile = signal<boolean>(false);
+  sheetOpen = signal<boolean>(false);
   isOpen = signal(false);
+
+  filterSummaryText = computed(() => {
+    const lens = this.store.mapLens();
+    if (!lens) return null;
+    const label = this.store.lensLabel();
+    return label ? `Filtro: ${label}` : null;
+  });
+
   expandedCode = computed(() => {
     const lens = this.store.mapLens();
     return lens?.kind === 'code' ? lens.code : null;
   });
+
+  constructor() {
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+      const mql = window.matchMedia('(max-width: 767.98px)');
+      this.isMobile.set(mql.matches);
+      const handler = (e: MediaQueryListEvent) => {
+        this.isMobile.set(e.matches);
+        if (!e.matches) {
+          this.sheetOpen.set(false);
+        }
+      };
+      if (mql.addEventListener) {
+        mql.addEventListener('change', handler);
+        this.destroyRef.onDestroy(() => mql.removeEventListener('change', handler));
+      } else if ((mql as any).addListener) {
+        (mql as any).addListener(handler);
+        this.destroyRef.onDestroy(() => (mql as any).removeListener(handler));
+      }
+    }
+
+    effect(() => {
+      // Siempre arranca plegado al entrar o cambiar de vuelo
+      this.store.manifest();
+      this.sheetOpen.set(false);
+    });
+  }
 
   manifest = this.store.manifest;
   activeServiceType = this.store.activeServiceType;
@@ -87,8 +128,35 @@ export class StatsSidebar {
     return lens?.kind === 'code' && lens.code === code;
   }
 
+  @HostListener('window:keydown.escape', ['$event'])
+  onEscape(event?: Event) {
+    if (this.isMobile() && this.sheetOpen()) {
+      event?.preventDefault();
+      this.collapseSheet();
+    }
+  }
+
+  collapseSheet() {
+    if (this.sheetOpen()) {
+      this.sheetOpen.set(false);
+      if (this.isMobile()) {
+        setTimeout(() => {
+          this.sheetHeaderButton?.nativeElement?.focus();
+        }, 0);
+      }
+    }
+  }
+
+  toggleSheet() {
+    if (this.sheetOpen()) {
+      this.collapseSheet();
+    } else {
+      this.sheetOpen.set(true);
+    }
+  }
+
   private scrollToMapIfMobile() {
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+    if (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth < 1024) {
       const seatMapEl = document.querySelector('app-seat-map');
       if (seatMapEl) {
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -105,7 +173,11 @@ export class StatsSidebar {
     const willBeActive = !current || current.kind !== lens.kind || (lens.kind === 'code' && (current as any).code !== lens.code);
     this.store.toggleMapLens(lens);
     if (willBeActive) {
-      this.scrollToMapIfMobile();
+      if (this.isMobile()) {
+        this.collapseSheet();
+      } else {
+        this.scrollToMapIfMobile();
+      }
     }
   }
 
@@ -113,7 +185,11 @@ export class StatsSidebar {
     const willBeActive = !this.store.showOccupancy();
     this.store.toggleOccupancy();
     if (willBeActive) {
-      this.scrollToMapIfMobile();
+      if (this.isMobile()) {
+        this.collapseSheet();
+      } else {
+        this.scrollToMapIfMobile();
+      }
     }
   }
 

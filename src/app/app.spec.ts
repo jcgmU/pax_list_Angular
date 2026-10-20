@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { App } from './app';
 import { StoreService } from './store.service';
+import { StatsSidebar } from './components/stats-sidebar/stats-sidebar';
 import { FLIGHT_CODES } from '../domain/flightCodes';
 import { countSSR } from '../domain/flightStats';
 import { Crown } from 'lucide-angular';
@@ -525,6 +527,104 @@ describe('App', () => {
 
       store.setManifest(FLIGHT_AV026);
       fixture.detectChanges();
+      expect(store.mapLens()).toBeNull();
+    });
+
+    it('Ronda 4: Estadísticas en móvil como bottom sheet sticky plegable/desplegable', async () => {
+      const fixture = TestBed.createComponent(App);
+      const store = TestBed.inject(StoreService);
+      await fixture.whenStable();
+
+      store.setManifest(FLIGHT_AV210);
+      fixture.detectChanges();
+
+      const statsDebugEl = fixture.debugElement.query(By.directive(StatsSidebar));
+      expect(statsDebugEl).toBeTruthy();
+      const statsComp = statsDebugEl.componentInstance as StatsSidebar;
+      const compiled = fixture.nativeElement as HTMLElement;
+
+      // 1. En escritorio (isMobile = false por defecto):
+      // El contenido nunca está inert y el panel lateral normal se muestra
+      const contentEl = compiled.querySelector('#stats-sheet-content') as HTMLElement;
+      expect(contentEl).toBeTruthy();
+      expect(contentEl.hasAttribute('inert')).toBe(false);
+
+      // 2. Simular modo móvil
+      statsComp.isMobile.set(true);
+      fixture.detectChanges();
+
+      // Debe iniciar PLEGADO
+      expect(statsComp.sheetOpen()).toBe(false);
+      const headerBtn = compiled.querySelector('button[aria-controls="stats-sheet-content"]') as HTMLButtonElement;
+      expect(headerBtn).toBeTruthy();
+      expect(headerBtn.getAttribute('aria-expanded')).toBe('false');
+      expect(contentEl.hasAttribute('inert')).toBe(true);
+
+      // 3. Resumen en el botón plegado muestra pax y libres
+      const stats = store.flightStats();
+      expect(headerBtn.textContent).toContain(`${stats.totalPassengers} pax`);
+      expect(headerBtn.textContent).toContain(`${stats.emptySeats} libres`);
+
+      // 4. Pulsar cabecera abre el sheet
+      headerBtn.click();
+      fixture.detectChanges();
+      expect(statsComp.sheetOpen()).toBe(true);
+      expect(headerBtn.getAttribute('aria-expanded')).toBe('true');
+      expect(contentEl.hasAttribute('inert')).toBe(false);
+
+      // Backdrop visible
+      const backdrop = compiled.querySelector('.fixed.inset-0.bg-ink\\/40') as HTMLElement;
+      expect(backdrop).toBeTruthy();
+
+      // 5. Pulsar tecla Esc pliega el sheet
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+      fixture.detectChanges();
+      expect(statsComp.sheetOpen()).toBe(false);
+      expect(headerBtn.getAttribute('aria-expanded')).toBe('false');
+      expect(contentEl.hasAttribute('inert')).toBe(true);
+
+      // 6. Abrir de nuevo y tocar el backdrop para plegar
+      headerBtn.click();
+      fixture.detectChanges();
+      expect(statsComp.sheetOpen()).toBe(true);
+
+      const backdrop2 = compiled.querySelector('.fixed.inset-0.bg-ink\\/40') as HTMLElement;
+      expect(backdrop2).toBeTruthy();
+      backdrop2.click();
+      fixture.detectChanges();
+      expect(statsComp.sheetOpen()).toBe(false);
+
+      // 7. Activar un filtro desde el sheet desplegado lo pliega automáticamente
+      headerBtn.click();
+      fixture.detectChanges();
+      expect(statsComp.sheetOpen()).toBe(true);
+
+      // Pulsar tarjeta Infantes dentro del sheet
+      const infantesBtn = compiled.querySelector('aside button[aria-pressed]:nth-of-type(2)') as HTMLButtonElement;
+      expect(infantesBtn).toBeTruthy();
+      infantesBtn.click();
+      fixture.detectChanges();
+
+      // El sheet se plegó automáticamente para ver el mapa
+      expect(statsComp.sheetOpen()).toBe(false);
+      expect(store.mapLens()?.kind).toBe('infants');
+
+      // Asientos en el mapa reflejan el filtro (sky)
+      const skySeats = (Array.from(compiled.querySelectorAll('app-seat-map button.size-11')) as HTMLButtonElement[])
+        .filter(b => b.className.includes('bg-sky-500/25'));
+      expect(skySeats.length).toBe(store.lensSeats()?.size ?? 0);
+
+      // El resumen plegado ahora incluye el filtro activo
+      expect(headerBtn.textContent).toContain('Filtro: Infantes (INF)');
+
+      // 8. Cambiar de vuelo siempre reinicia el sheet a plegado
+      headerBtn.click();
+      fixture.detectChanges();
+      expect(statsComp.sheetOpen()).toBe(true);
+
+      store.setManifest(FLIGHT_AV026);
+      fixture.detectChanges();
+      expect(statsComp.sheetOpen()).toBe(false);
       expect(store.mapLens()).toBeNull();
     });
 

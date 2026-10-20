@@ -1,14 +1,64 @@
 @if (manifest()) {
-  <!-- En móvil se apila bajo el mapa; la búsqueda vive en la barra del mapa -->
-  <aside class="flex flex-col w-full h-auto lg:h-full glass-panel rounded-3xl p-4 md:p-6 overflow-hidden animate-in slide-in-from-right duration-300">
-    <h2 class="text-fg font-semibold text-lg mb-4 tracking-tight shrink-0 flex items-center gap-2">
+  <!-- Backdrop sutil para móvil cuando el sheet está desplegado -->
+  @if (isMobile() && sheetOpen()) {
+    <div
+      class="fixed inset-0 bg-ink/40 z-[35] md:hidden animate-in fade-in duration-200"
+      (click)="collapseSheet()"
+      aria-hidden="true"
+    ></div>
+  }
+
+  <!-- En móvil es bottom sheet sticky plegable; en md+ es panel estático -->
+  <aside
+    id="stats-sheet"
+    aria-label="Estadísticas"
+    class="glass-panel flex flex-col w-full overflow-hidden transition-[max-height,transform] duration-200 ease-out motion-reduce:transition-none
+           fixed inset-x-0 bottom-0 z-40 rounded-t-3xl rounded-b-none border-t border-x-0 border-b-0 border-line shadow-2xl pb-[env(safe-area-inset-bottom,0px)]
+           md:static md:z-auto md:max-h-none md:h-auto lg:h-full md:rounded-3xl md:border md:border-line md:shadow-none md:pb-0 md:p-6"
+    [class.max-h-[min(75dvh,640px)]]="isMobile() && sheetOpen()"
+    [class.max-h-[calc(56px+env(safe-area-inset-bottom,0px))]]="isMobile() && !sheetOpen()"
+    [class.hidden]="isMobile() && (store.comandaOpen() || !!store.selectedSeat())"
+  >
+    <!-- Header móvil: botón interactivo para el bottom sheet -->
+    <button
+      #sheetHeaderButton
+      type="button"
+      (click)="toggleSheet()"
+      [attr.aria-expanded]="sheetOpen()"
+      aria-controls="stats-sheet-content"
+      class="md:hidden w-full min-h-[56px] px-4 py-3 flex items-center justify-between gap-3 text-left shrink-0 cursor-pointer select-none"
+      [attr.aria-label]="'Estadísticas, ' + (sheetOpen() ? 'desplegado' : 'plegado')"
+    >
+      <div class="flex items-center gap-2 min-w-0">
+        <lucide-angular [img]="BarChart2" size="18" class="text-fg-3 shrink-0"></lucide-angular>
+        <span class="text-fg font-semibold text-base tracking-tight shrink-0">Estadísticas</span>
+        <span class="text-xs text-fg-3 tabular-nums truncate ml-1">
+          {{ stats().totalPassengers }} pax · {{ stats().emptySeats }} libres@if (filterSummaryText(); as filterText) { · {{ filterText }}}
+        </span>
+      </div>
+      <div
+        class="size-8 rounded-full flex items-center justify-center text-fg-3 hover:text-fg hover:bg-fg/5 shrink-0 transition-transform duration-200 motion-reduce:transition-none"
+        [class.rotate-180]="sheetOpen()"
+      >
+        <lucide-angular [img]="ChevronUp" size="18"></lucide-angular>
+      </div>
+    </button>
+
+    <!-- Header tablet y escritorio (md+) -->
+    <h2 class="hidden md:flex text-fg font-semibold text-lg mb-4 tracking-tight shrink-0 items-center gap-2">
       <lucide-angular [img]="BarChart2" size="18" class="text-fg-3"></lucide-angular>
       Estadísticas
     </h2>
 
     <app-search-bar class="hidden md:block shrink-0"></app-search-bar>
 
-    <div class="flex-1 overflow-y-auto scrollbar-hide space-y-5 pr-1 pb-4">
+    <div
+      id="stats-sheet-content"
+      [attr.inert]="isMobile() && !sheetOpen() ? '' : null"
+      [attr.aria-hidden]="isMobile() && !sheetOpen() ? 'true' : null"
+      class="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollbar-hide space-y-5 px-4 pb-6 md:px-0 md:pb-4 pr-1"
+      [class.hidden]="isMobile() && !sheetOpen()"
+    >
       <!-- Bento Grid for Flight Stats -->
       <div class="grid grid-cols-2 gap-2.5 shrink-0">
         <!-- Bento Card 1: Total Pax -->
