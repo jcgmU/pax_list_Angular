@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { StoreService } from '../../store.service';
+import { StoreService, MapLens } from '../../store.service';
 import { SearchBar } from '../search-bar/search-bar';
 import { 
   LucideAngularModule, 
@@ -35,7 +35,10 @@ export class StatsSidebar {
   readonly Crown = Crown;
 
   isOpen = signal(false);
-  expandedCode = signal<string | null>(null);
+  expandedCode = computed(() => {
+    const lens = this.store.mapLens();
+    return lens?.kind === 'code' ? lens.code : null;
+  });
 
   manifest = this.store.manifest;
   activeServiceType = this.store.activeServiceType;
@@ -79,8 +82,43 @@ export class StatsSidebar {
       .sort((a, b) => a.seat.localeCompare(b.seat, undefined, { numeric: true }));
   }
 
+  isLensCodeActive(code: string): boolean {
+    const lens = this.store.mapLens();
+    return lens?.kind === 'code' && lens.code === code;
+  }
+
+  private scrollToMapIfMobile() {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      const seatMapEl = document.querySelector('app-seat-map');
+      if (seatMapEl) {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        seatMapEl.scrollIntoView({
+          block: 'start',
+          behavior: prefersReducedMotion ? 'auto' : 'smooth',
+        });
+      }
+    }
+  }
+
+  toggleLens(lens: MapLens) {
+    const current = this.store.mapLens();
+    const willBeActive = !current || current.kind !== lens.kind || (lens.kind === 'code' && (current as any).code !== lens.code);
+    this.store.toggleMapLens(lens);
+    if (willBeActive) {
+      this.scrollToMapIfMobile();
+    }
+  }
+
+  toggleOccupancy() {
+    const willBeActive = !this.store.showOccupancy();
+    this.store.toggleOccupancy();
+    if (willBeActive) {
+      this.scrollToMapIfMobile();
+    }
+  }
+
   handleCodeClick(code: string) {
-    this.expandedCode.update(prev => (prev === code ? null : code));
+    this.toggleLens({ kind: 'code', code });
   }
 
   toggleOpen() {

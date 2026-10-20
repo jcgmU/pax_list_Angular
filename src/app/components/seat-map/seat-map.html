@@ -1,17 +1,46 @@
 @if (store.manifest(); as manifest) {
   <div class="flex flex-col w-full gap-4 pb-24 lg:pb-8">
     <!-- Buscar (solo móvil; en escritorio vive en el panel lateral) -->
-    <div class="lg:hidden">
-      <div class="flex items-center justify-between gap-3">
-        <p class="text-fg-3 text-sm">{{ config()?.id }}</p>
+    <div class="lg:hidden flex flex-col gap-2">
+      <div class="flex items-center justify-between gap-2 flex-wrap">
+        <p class="text-fg-3 text-sm shrink-0">{{ config()?.id }}</p>
+        <div class="flex items-center gap-2">
+        <button
+          type="button"
+          (click)="store.toggleOccupancy()"
+          [attr.aria-pressed]="store.showOccupancy()"
+          class="md:hidden h-11 px-3.5 inline-flex items-center gap-1.5 rounded-full border text-xs sm:text-sm font-semibold transition-[background-color,border-color] duration-150 active:scale-[0.97] motion-reduce:transition-none cursor-pointer"
+          [ngClass]="store.showOccupancy()
+            ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300'
+            : 'border-line-strong text-fg-2 hover:bg-fg/5'"
+        >
+          Sillas vacías
+          <span class="font-display tabular-nums">{{ store.flightStats().emptySeats }}</span>
+        </button>
         <button
           (click)="toggleSearch()"
           aria-label="Buscar pasajero o asiento"
-          class="size-11 inline-flex items-center justify-center rounded-full border border-line-strong text-fg-2 hover:bg-fg/5 transition-colors"
+          class="size-11 inline-flex items-center justify-center rounded-full border border-line-strong text-fg-2 hover:bg-fg/5 transition-colors cursor-pointer"
         >
           <lucide-angular [img]="Search" size="18"></lucide-angular>
         </button>
+        </div>
       </div>
+      @if (store.mapLens(); as lens) {
+        <div class="flex items-center justify-between gap-2 px-3 py-1 bg-sky-500/10 border border-sky-500/30 rounded-2xl text-xs text-sky-900 dark:text-sky-200">
+          <span class="font-medium truncate">
+            Filtro: <span class="font-semibold">{{ store.lensLabel() }}</span> · {{ lens.kind === 'occupancy' ? store.flightStats().emptySeats : (store.lensSeats()?.size ?? 0) }}
+          </span>
+          <button
+            type="button"
+            (click)="store.clearMapLens()"
+            class="min-h-[44px] px-3 inline-flex items-center text-xs font-bold text-sky-700 dark:text-sky-300 hover:underline cursor-pointer shrink-0"
+            aria-label="Quitar filtro del mapa"
+          >
+            Quitar
+          </button>
+        </div>
+      }
       @if (showSearch) {
         <div class="pt-2">
           <app-search-bar></app-search-bar>
@@ -20,20 +49,34 @@
     </div>
 
     <!-- Leyenda: el color nunca es el único canal -->
-    <ul class="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-fg-2 justify-center" aria-label="Leyenda del mapa">
-      <li class="flex items-center gap-2"><span class="size-4 rounded-md border border-line-strong"></span>Libre</li>
-      <li class="flex items-center gap-2"><span class="size-4 rounded-md bg-panel-3 border border-line-strong"></span>Ocupado</li>
-      <li class="flex items-center gap-2"><span class="size-4 rounded-md bg-gradient-to-br from-[#5b1a78] to-[#c05f9a]"></span>Magno</li>
-      <li class="flex items-center gap-2"><span class="size-4 rounded-md bg-gradient-to-br from-slate-800 to-slate-900 dark:from-slate-100 dark:to-slate-300"></span>Diamond</li>
-      <li class="flex items-center gap-2"><span class="size-4 rounded-md bg-gradient-to-br from-amber-400 to-amber-500"></span>Gold</li>
-      <li class="flex items-center gap-2"><span class="size-4 rounded-full bg-rose-600 inline-flex items-center justify-center"><lucide-angular [img]="AlertTriangle" size="10" strokeWidth="3" class="text-white"></lucide-angular></span>Alerta NPS</li>
-    </ul>
+    @if (store.showOccupancy()) {
+      <ul class="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-fg-2 justify-center" aria-label="Leyenda del mapa de ocupación">
+        <li class="flex items-center gap-2"><span class="size-4 rounded-md bg-emerald-500/20 border border-emerald-500/60"></span>Libre ({{ store.flightStats().emptySeats }})</li>
+        <li class="flex items-center gap-2"><span class="size-4 rounded-md bg-amber-400/25 border border-amber-500/60"></span>Ocupado ({{ store.flightStats().totalPassengers }})</li>
+        <li class="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-semibold"><span class="size-2 rounded-full bg-emerald-500"></span>Modo Sillas Vacías activo</li>
+      </ul>
+    } @else if (store.mapLens(); as lens) {
+      <ul class="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-fg-2 justify-center" aria-label="Leyenda del mapa de filtro">
+        <li class="flex items-center gap-2"><span class="size-4 rounded-md bg-sky-500/25 border border-sky-500/60"></span>Coincide ({{ store.lensSeats()?.size ?? 0 }} asientos)</li>
+        <li class="flex items-center gap-2 opacity-60"><span class="size-4 rounded-md border border-line-strong"></span>Otros</li>
+        <li class="flex items-center gap-2 text-sky-700 dark:text-sky-300 font-semibold"><span class="size-2 rounded-full bg-sky-500"></span>Mostrando: {{ store.lensLabel() }}</li>
+      </ul>
+    } @else {
+      <ul class="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-fg-2 justify-center" aria-label="Leyenda del mapa">
+        <li class="flex items-center gap-2"><span class="size-4 rounded-md border border-line-strong"></span>Libre</li>
+        <li class="flex items-center gap-2"><span class="size-4 rounded-md bg-panel-3 border border-line-strong"></span>Ocupado</li>
+        <li class="flex items-center gap-2"><span class="size-4 rounded-md bg-gradient-to-br from-[#5b1a78] to-[#c05f9a]"></span>Magno</li>
+        <li class="flex items-center gap-2"><span class="size-4 rounded-md bg-gradient-to-br from-slate-800 to-slate-900 dark:from-slate-100 dark:to-slate-300"></span>Diamond</li>
+        <li class="flex items-center gap-2"><span class="size-4 rounded-md bg-gradient-to-br from-amber-400 to-amber-500"></span>Gold</li>
+        <li class="flex items-center gap-2"><span class="size-4 rounded-full bg-rose-600 inline-flex items-center justify-center"><lucide-angular [img]="AlertTriangle" size="10" strokeWidth="3" class="text-white"></lucide-angular></span>Alerta NPS</li>
+      </ul>
+    }
 
     <div class="overflow-x-auto scrollbar-hide">
-      <div class="min-w-max lg:min-w-0 flex flex-col items-center px-10 pt-2">
+      <div data-fit-target [style.zoom]="fitZoom()" class="min-w-max lg:min-w-0 flex flex-col items-center px-4 sm:px-14 pt-2">
 
         <!-- Fuselaje: un solo brillo de marca en la proa; el borde declara la elevación -->
-        <div class="w-full max-w-xl rounded-t-[160px] rounded-b-[48px] border border-line-strong p-8 pt-14 flex flex-col gap-6 relative fuselage">
+        <div class="w-full max-w-xl rounded-t-[160px] rounded-b-[48px] border border-line-strong p-5 pt-12 sm:p-8 sm:pt-14 flex flex-col gap-6 relative fuselage">
 
           <!-- Cabina de mando -->
           <div class="w-full flex flex-col items-center border-b border-line pb-8 mb-2">
@@ -50,13 +93,13 @@
             @if (element.type === 'facility') {
               <div class="relative w-full py-5 flex flex-col items-center">
                 <!-- Salidas -->
-                <div class="absolute left-[-52px] top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-                  <span class="text-[11px] font-semibold text-brand-text uppercase tracking-wider select-none">Exit</span>
+                <div class="absolute left-[-14px] sm:left-[-52px] top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                  <span class="hidden sm:inline text-[11px] font-semibold text-brand-text uppercase tracking-wider select-none">Exit</span>
                   <div class="w-1.5 h-12 bg-brand rounded-full"></div>
                 </div>
-                <div class="absolute right-[-52px] top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                <div class="absolute right-[-14px] sm:right-[-52px] top-1/2 -translate-y-1/2 flex items-center gap-1.5">
                   <div class="w-1.5 h-12 bg-brand rounded-full"></div>
-                  <span class="text-[11px] font-semibold text-brand-text uppercase tracking-wider select-none">Exit</span>
+                  <span class="hidden sm:inline text-[11px] font-semibold text-brand-text uppercase tracking-wider select-none">Exit</span>
                 </div>
 
                 @if (element.components && element.components.length > 0) {

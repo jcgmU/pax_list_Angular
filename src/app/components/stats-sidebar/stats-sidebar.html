@@ -1,12 +1,12 @@
 @if (manifest()) {
-  <!-- Desktop/Tablet Sidebar (md+) -->
-  <aside class="hidden md:flex flex-col w-full h-auto lg:h-full glass-panel rounded-3xl p-6 overflow-hidden animate-in slide-in-from-right duration-300">
+  <!-- En móvil se apila bajo el mapa; la búsqueda vive en la barra del mapa -->
+  <aside class="flex flex-col w-full h-auto lg:h-full glass-panel rounded-3xl p-4 md:p-6 overflow-hidden animate-in slide-in-from-right duration-300">
     <h2 class="text-fg font-semibold text-lg mb-4 tracking-tight shrink-0 flex items-center gap-2">
       <lucide-angular [img]="BarChart2" size="18" class="text-fg-3"></lucide-angular>
       Estadísticas
     </h2>
 
-    <app-search-bar class="shrink-0"></app-search-bar>
+    <app-search-bar class="hidden md:block shrink-0"></app-search-bar>
 
     <div class="flex-1 overflow-y-auto scrollbar-hide space-y-5 pr-1 pb-4">
       <!-- Bento Grid for Flight Stats -->
@@ -23,29 +23,89 @@
           </div>
         </div>
 
-        <!-- Bento Card 2: Sillas Vacías -->
-        <div class="p-3 bg-fg/[0.04] border border-line text-fg rounded-2xl flex flex-col justify-between min-h-[80px]">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-fg-3">Sillas Vacías</span>
+        <!-- Bento Card 2: Sillas Vacías (Toggle Ocupación) -->
+        <button
+          type="button"
+          (click)="toggleOccupancy()"
+          [attr.aria-pressed]="store.showOccupancy()"
+          class="p-3 border rounded-2xl flex flex-col justify-between min-h-[80px] text-left transition-[background-color,border-color,box-shadow,transform] duration-150 ease-out active:scale-[0.99] motion-reduce:transition-none cursor-pointer"
+          [ngClass]="store.showOccupancy()
+            ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300 shadow-sm'
+            : 'bg-fg/[0.04] border-line text-fg hover:border-line-strong hover:bg-fg/[0.07]'"
+        >
+          <div class="flex items-center justify-between w-full">
+            <span class="text-[11px] font-bold uppercase tracking-wider" [ngClass]="store.showOccupancy() ? 'text-emerald-700 dark:text-emerald-300' : 'text-fg-3'">
+              Sillas Vacías
+            </span>
+            @if (store.showOccupancy()) {
+              <span class="text-[11px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-300">Activo</span>
+            }
+          </div>
           <span class="text-2xl font-bold font-display tracking-tight mt-2">{{ stats().emptySeats }}</span>
-        </div>
+        </button>
 
         <!-- Bento Card 3: Infantes -->
-        <div class="p-3 bg-fg/[0.04] border border-line text-fg rounded-2xl flex flex-col justify-between min-h-[80px]">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-fg-3">Infantes (INF)</span>
+        <button
+          type="button"
+          (click)="toggleLens({ kind: 'infants' })"
+          [attr.aria-pressed]="store.mapLens()?.kind === 'infants'"
+          class="p-3 border rounded-2xl flex flex-col justify-between min-h-[80px] text-left transition-[background-color,border-color,box-shadow,transform] duration-150 ease-out active:scale-[0.99] motion-reduce:transition-none cursor-pointer"
+          [ngClass]="store.mapLens()?.kind === 'infants'
+            ? 'bg-sky-500/10 border-sky-500/30 text-sky-700 dark:text-sky-300 shadow-sm'
+            : 'bg-fg/[0.04] border-line text-fg hover:border-line-strong hover:bg-fg/[0.07]'"
+        >
+          <div class="flex items-center justify-between w-full">
+            <span class="text-[11px] font-bold uppercase tracking-wider" [ngClass]="store.mapLens()?.kind === 'infants' ? 'text-sky-700 dark:text-sky-300' : 'text-fg-3'">
+              Infantes (INF)
+            </span>
+            @if (store.mapLens()?.kind === 'infants') {
+              <span class="text-[11px] font-bold uppercase tracking-widest text-sky-700 dark:text-sky-300">Activo</span>
+            }
+          </div>
           <span class="text-2xl font-bold font-display tracking-tight mt-2">{{ stats().infantCount }}</span>
-        </div>
+        </button>
 
         <!-- Bento Card 4: Especiales SSR -->
-        <div class="p-3 bg-fg/[0.04] border border-line text-fg rounded-2xl flex flex-col justify-between min-h-[80px]">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-fg-3">Servicios SSR</span>
+        <button
+          type="button"
+          (click)="toggleLens({ kind: 'ssr' })"
+          [attr.aria-pressed]="store.mapLens()?.kind === 'ssr'"
+          class="p-3 border rounded-2xl flex flex-col justify-between min-h-[80px] text-left transition-[background-color,border-color,box-shadow,transform] duration-150 ease-out active:scale-[0.99] motion-reduce:transition-none cursor-pointer"
+          [ngClass]="store.mapLens()?.kind === 'ssr'
+            ? 'bg-sky-500/10 border-sky-500/30 text-sky-700 dark:text-sky-300 shadow-sm'
+            : 'bg-fg/[0.04] border-line text-fg hover:border-line-strong hover:bg-fg/[0.07]'"
+        >
+          <div class="flex items-center justify-between w-full">
+            <span class="text-[11px] font-bold uppercase tracking-wider" [ngClass]="store.mapLens()?.kind === 'ssr' ? 'text-sky-700 dark:text-sky-300' : 'text-fg-3'">
+              Servicios SSR
+            </span>
+            @if (store.mapLens()?.kind === 'ssr') {
+              <span class="text-[11px] font-bold uppercase tracking-widest text-sky-700 dark:text-sky-300">Activo</span>
+            }
+          </div>
           <span class="text-2xl font-bold font-display tracking-tight mt-2">{{ totalSSR() }}</span>
-        </div>
+        </button>
 
         <!-- Bento Card 5: Comidas -->
-        <div class="p-3 bg-fg/[0.04] border border-line text-fg rounded-2xl flex flex-col justify-between min-h-[80px]">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-fg-3">Comidas</span>
+        <button
+          type="button"
+          (click)="toggleLens({ kind: 'meals' })"
+          [attr.aria-pressed]="store.mapLens()?.kind === 'meals'"
+          class="p-3 border rounded-2xl flex flex-col justify-between min-h-[80px] text-left transition-[background-color,border-color,box-shadow,transform] duration-150 ease-out active:scale-[0.99] motion-reduce:transition-none cursor-pointer"
+          [ngClass]="store.mapLens()?.kind === 'meals'
+            ? 'bg-sky-500/10 border-sky-500/30 text-sky-700 dark:text-sky-300 shadow-sm'
+            : 'bg-fg/[0.04] border-line text-fg hover:border-line-strong hover:bg-fg/[0.07]'"
+        >
+          <div class="flex items-center justify-between w-full">
+            <span class="text-[11px] font-bold uppercase tracking-wider" [ngClass]="store.mapLens()?.kind === 'meals' ? 'text-sky-700 dark:text-sky-300' : 'text-fg-3'">
+              Comidas
+            </span>
+            @if (store.mapLens()?.kind === 'meals') {
+              <span class="text-[11px] font-bold uppercase tracking-widest text-sky-700 dark:text-sky-300">Activo</span>
+            }
+          </div>
           <span class="text-2xl font-bold font-display tracking-tight mt-2">{{ stats().totalMeals }}</span>
-        </div>
+        </button>
       </div>
 
       <!-- SSR Codes Section -->
@@ -54,15 +114,18 @@
           <h3 class="text-[11px] font-bold text-fg-3 uppercase tracking-widest mb-3">Servicios por Código</h3>
           <div class="grid grid-cols-2 gap-2">
             @for (code of ssrCodes(); track code) {
+              @let isCodeActive = isLensCodeActive(code);
               <button
+                type="button"
                 (click)="handleCodeClick(code)"
-                class="bg-panel-2 hover:bg-fg/5 cursor-pointer min-h-11 px-3 rounded-xl flex justify-between items-center transition-colors border border-line"
-                [class.ring-2]="expandedCode() === code"
-                [class.ring-[#E20613]/20]="expandedCode() === code"
-                [class.bg-fg/[0.07]]="expandedCode() === code"
+                [attr.aria-pressed]="isCodeActive"
+                class="cursor-pointer min-h-11 px-3 rounded-xl flex justify-between items-center transition-[background-color,border-color] duration-150 border"
+                [ngClass]="isCodeActive
+                  ? 'bg-sky-500/15 border-sky-500/40 text-sky-700 dark:text-sky-300'
+                  : 'bg-panel-2 border-line text-fg hover:bg-fg/5'"
               >
-                <span class="text-[11px] font-bold text-fg-3">{{ code }}</span>
-                <span class="text-xs font-bold text-fg-2">{{ stats().ssrCounts[code] }}</span>
+                <span class="text-[11px] font-bold" [ngClass]="isCodeActive ? 'text-sky-700 dark:text-sky-300' : 'text-fg-3'">{{ code }}</span>
+                <span class="text-xs font-bold" [ngClass]="isCodeActive ? 'text-sky-700 dark:text-sky-300' : 'text-fg-2'">{{ stats().ssrCounts[code] }}</span>
               </button>
             }
           </div>
