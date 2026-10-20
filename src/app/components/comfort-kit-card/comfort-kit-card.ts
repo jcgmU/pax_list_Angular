@@ -1,14 +1,10 @@
-import { Component, Input, inject, computed } from '@angular/core';
+import { Component, input, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StoreService } from '../../store.service';
 import { ParsedPassenger } from '../../../infrastructure/mockData';
 import {
-  HOODIE_SIZES,
-  PANTS_SIZES,
-  SLIPPER_SIZES,
-  HoodieSize,
-  PantsSize,
-  SlipperSize,
+  KIT_SIZES,
+  KitSize,
   isComfortKitRegistered,
 } from '../../../domain/comfortKit';
 import { LucideAngularModule, Shirt, Footprints, CheckCircle2, History } from 'lucide-angular';
@@ -20,7 +16,7 @@ import { LucideAngularModule, Shirt, Footprints, CheckCircle2, History } from 'l
   templateUrl: './comfort-kit-card.html',
 })
 export class ComfortKitCard {
-  @Input({ required: true }) passenger!: ParsedPassenger;
+  passenger = input.required<ParsedPassenger>();
   store = inject(StoreService);
 
   readonly Shirt = Shirt;
@@ -28,26 +24,19 @@ export class ComfortKitCard {
   readonly CheckCircle2 = CheckCircle2;
   readonly History = History;
 
-  readonly hoodieSizes = HOODIE_SIZES;
-  readonly pantsSizes = PANTS_SIZES;
-  readonly slipperSizes = SLIPPER_SIZES;
+  readonly kitSizes = KIT_SIZES;
 
-  profile = computed(() => this.store.getComfortKitProfile(this.passenger));
+  profile = computed(() => this.store.getComfortKitProfile(this.passenger()));
   isRegistered = computed(() => isComfortKitRegistered(this.profile()));
 
-  setHoodieSize(event: Event) {
-    const value = (event.target as HTMLSelectElement).value as HoodieSize | '';
-    this.store.setComfortKitSizes(this.passenger, { hoodieSize: value || undefined });
+  setPajamaSize(event: Event) {
+    const value = (event.target as HTMLSelectElement).value as KitSize | '';
+    this.store.setComfortKitSizes(this.passenger(), { pajamaSize: value || undefined });
   }
 
-  setPantsSize(event: Event) {
-    const value = (event.target as HTMLSelectElement).value as PantsSize | '';
-    this.store.setComfortKitSizes(this.passenger, { pantsSize: value || undefined });
-  }
-
-  setSlipperSize(event: Event) {
-    const value = (event.target as HTMLSelectElement).value as SlipperSize | '';
-    this.store.setComfortKitSizes(this.passenger, { slipperSize: value || undefined });
+  setSleeperSize(event: Event) {
+    const value = (event.target as HTMLSelectElement).value as KitSize | '';
+    this.store.setComfortKitSizes(this.passenger(), { sleeperSize: value || undefined });
   }
 
   formatUpdatedAt(iso: string | undefined): string {

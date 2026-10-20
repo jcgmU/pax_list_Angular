@@ -24,62 +24,46 @@
       </p>
     }
 
-    <div class="grid grid-cols-3 gap-2.5">
-      <!-- Sudadera -->
+    <div class="grid grid-cols-2 gap-3">
+      <!-- Pijama -->
       <div class="space-y-1.5">
-        <label class="text-[11px] font-bold text-fg-3 uppercase tracking-widest flex items-center gap-1.5">
+        <label for="kit-pajama-size" class="text-[11px] font-bold text-fg-3 uppercase tracking-widest flex items-center gap-1.5">
           <lucide-icon [name]="Shirt" [size]="11" class="text-fg-3"></lucide-icon>
-          Sudadera
+          Pijama
         </label>
         <div class="relative flex items-center">
           <select
-            [value]="profile()?.hoodieSize ?? ''"
-            (change)="setHoodieSize($event)"
+            id="kit-pajama-size"
+            aria-label="Talla de pijama"
+            [value]="profile()?.pajamaSize ?? ''"
+            (change)="setPajamaSize($event)"
             class="w-full pl-3 pr-8 py-2.5 bg-panel-2 border border-line-strong rounded-xl text-xs text-fg font-bold focus:ring-2 focus:ring-[#E20613]/25 outline-none transition-all appearance-none cursor-pointer"
           >
-            <option value="" [selected]="!profile()?.hoodieSize">— Talla —</option>
-            @for (size of hoodieSizes; track size) {
-              <option [value]="size" [selected]="profile()?.hoodieSize === size">{{ size }}</option>
+            <option value="" [selected]="!profile()?.pajamaSize">— Talla —</option>
+            @for (size of kitSizes; track size) {
+              <option [value]="size" [selected]="profile()?.pajamaSize === size">{{ size }}</option>
             }
           </select>
         </div>
       </div>
 
-      <!-- Pantalón -->
+      <!-- Sleepers -->
       <div class="space-y-1.5">
-        <label class="text-[11px] font-bold text-fg-3 uppercase tracking-widest flex items-center gap-1.5">
-          <lucide-icon [name]="Shirt" [size]="11" class="text-fg-3"></lucide-icon>
-          Pantalón
-        </label>
-        <div class="relative flex items-center">
-          <select
-            [value]="profile()?.pantsSize ?? ''"
-            (change)="setPantsSize($event)"
-            class="w-full pl-3 pr-8 py-2.5 bg-panel-2 border border-line-strong rounded-xl text-xs text-fg font-bold focus:ring-2 focus:ring-[#E20613]/25 outline-none transition-all appearance-none cursor-pointer"
-          >
-            <option value="" [selected]="!profile()?.pantsSize">— Talla —</option>
-            @for (size of pantsSizes; track size) {
-              <option [value]="size" [selected]="profile()?.pantsSize === size">{{ size }}</option>
-            }
-          </select>
-        </div>
-      </div>
-
-      <!-- Pantuflas -->
-      <div class="space-y-1.5">
-        <label class="text-[11px] font-bold text-fg-3 uppercase tracking-widest flex items-center gap-1.5">
+        <label for="kit-sleeper-size" class="text-[11px] font-bold text-fg-3 uppercase tracking-widest flex items-center gap-1.5">
           <lucide-icon [name]="Footprints" [size]="11" class="text-fg-3"></lucide-icon>
-          Pantuflas
+          Sleepers
         </label>
         <div class="relative flex items-center">
           <select
-            [value]="profile()?.slipperSize ?? ''"
-            (change)="setSlipperSize($event)"
+            id="kit-sleeper-size"
+            aria-label="Talla de sleepers"
+            [value]="profile()?.sleeperSize ?? ''"
+            (change)="setSleeperSize($event)"
             class="w-full pl-3 pr-8 py-2.5 bg-panel-2 border border-line-strong rounded-xl text-xs text-fg font-bold focus:ring-2 focus:ring-[#E20613]/25 outline-none transition-all appearance-none cursor-pointer"
           >
-            <option value="" [selected]="!profile()?.slipperSize">— Talla —</option>
-            @for (size of slipperSizes; track size) {
-              <option [value]="size" [selected]="profile()?.slipperSize === size">{{ size }}</option>
+            <option value="" [selected]="!profile()?.sleeperSize">— Talla —</option>
+            @for (size of kitSizes; track size) {
+              <option [value]="size" [selected]="profile()?.sleeperSize === size">{{ size }}</option>
             }
           </select>
         </div>

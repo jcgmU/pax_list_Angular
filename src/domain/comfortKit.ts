@@ -1,18 +1,11 @@
 import type { ParsedPassenger } from '../infrastructure/mockData';
 
-export const HOODIE_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'] as const;
-export type HoodieSize = (typeof HOODIE_SIZES)[number];
-
-export const PANTS_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'] as const;
-export type PantsSize = (typeof PANTS_SIZES)[number];
-
-export const SLIPPER_SIZES = ['S', 'M', 'L'] as const;
-export type SlipperSize = (typeof SLIPPER_SIZES)[number];
+export const KIT_SIZES = ['S/M', 'L/XL', 'XXL'] as const;
+export type KitSize = (typeof KIT_SIZES)[number];
 
 export interface ComfortKitSizes {
-  hoodieSize?: HoodieSize;
-  pantsSize?: PantsSize;
-  slipperSize?: SlipperSize;
+  pajamaSize?: KitSize;
+  sleeperSize?: KitSize;
 }
 
 export interface ComfortKitProfile extends ComfortKitSizes {
@@ -35,5 +28,5 @@ export function deriveTravelerId(passenger: Pick<ParsedPassenger, 'firstName' | 
 }
 
 export function isComfortKitRegistered(sizes: ComfortKitSizes | undefined): boolean {
-  return !!sizes?.hoodieSize && !!sizes?.pantsSize && !!sizes?.slipperSize;
+  return !!sizes?.pajamaSize && !!sizes?.sleeperSize;
 }

@@ -1,35 +1,89 @@
-import type { ComfortKitProfile, ComfortKitSizes } from '../domain/comfortKit';
-import { deriveTravelerId } from '../domain/comfortKit';
+import type { ComfortKitProfile, ComfortKitSizes, KitSize } from '../domain/comfortKit';
+import { deriveTravelerId, KIT_SIZES } from '../domain/comfortKit';
 
 // Simula el perfil de lealtad del pasajero persistido en el CRM (LifeMiles).
-// En producción esto se sustituye por el `lifemiles.adapter.ts` del BFF —
-// el resto de la app no necesita cambiar cuando eso ocurra.
-const STORAGE_KEY = 'avianca:comfort-kit-profiles';
+// Clave con versión para asegurar migración limpia de esquemas antiguos.
+const STORAGE_KEY_V2 = 'avianca:comfort-kit-profiles:v2';
+const STORAGE_KEY_LEGACY = 'avianca:comfort-kit-profiles';
 
 // Datos de demo: pasajeros Elite que ya volaron antes y dejaron su talla registrada.
-// Igual que mockData.ts, esto es solo para prototipar el flujo — se retira cuando
-// el perfil venga del CRM real de LifeMiles.
 const DEMO_SEEDS: Array<{
   lastName: string;
   firstName: string;
-  hoodieSize: NonNullable<ComfortKitSizes['hoodieSize']>;
-  pantsSize: NonNullable<ComfortKitSizes['pantsSize']>;
-  slipperSize: NonNullable<ComfortKitSizes['slipperSize']>;
+  pajamaSize: NonNullable<ComfortKitSizes['pajamaSize']>;
+  sleeperSize: NonNullable<ComfortKitSizes['sleeperSize']>;
   daysAgo: number;
 }> = [
-  { lastName: 'RAMIREZ', firstName: 'CARLOS', hoodieSize: 'L', pantsSize: 'L', slipperSize: 'M', daysAgo: 14 },
-  { lastName: 'OSPINA', firstName: 'LUCIA', hoodieSize: 'S', pantsSize: 'S', slipperSize: 'S', daysAgo: 30 },
-  { lastName: 'ECHEVERRI', firstName: 'RAFAEL', hoodieSize: 'XL', pantsSize: 'XL', slipperSize: 'L', daysAgo: 7 },
-  { lastName: 'PALACIO', firstName: 'HELENA', hoodieSize: 'M', pantsSize: 'M', slipperSize: 'M', daysAgo: 21 },
-  { lastName: 'LLINÁS', firstName: 'GUSTAVO', hoodieSize: 'XL', pantsSize: 'XL', slipperSize: 'L', daysAgo: 3 },
-  { lastName: 'BARRIOS', firstName: 'MARINA', hoodieSize: 'S', pantsSize: 'S', slipperSize: 'S', daysAgo: 45 },
+  { lastName: 'RAMIREZ', firstName: 'CARLOS', pajamaSize: 'L/XL', sleeperSize: 'S/M', daysAgo: 14 },
+  { lastName: 'OSPINA', firstName: 'LUCIA', pajamaSize: 'S/M', sleeperSize: 'S/M', daysAgo: 30 },
+  { lastName: 'ECHEVERRI', firstName: 'RAFAEL', pajamaSize: 'L/XL', sleeperSize: 'L/XL', daysAgo: 7 },
+  { lastName: 'PALACIO', firstName: 'HELENA', pajamaSize: 'S/M', sleeperSize: 'S/M', daysAgo: 21 },
+  { lastName: 'LLINÁS', firstName: 'GUSTAVO', pajamaSize: 'L/XL', sleeperSize: 'L/XL', daysAgo: 3 },
+  { lastName: 'BARRIOS', firstName: 'MARINA', pajamaSize: 'S/M', sleeperSize: 'S/M', daysAgo: 45 },
 ];
+
+function normalizePajamaSize(legacySize: unknown): KitSize | undefined {
+  if (typeof legacySize !== 'string') return undefined;
+  if ((KIT_SIZES as readonly string[]).includes(legacySize)) return legacySize as KitSize;
+  const upper = legacySize.toUpperCase();
+  if (['XS', 'S', 'M'].includes(upper)) return 'S/M';
+  if (['L', 'XL'].includes(upper)) return 'L/XL';
+  if (upper === 'XXL') return 'XXL';
+  return undefined;
+}
+
+function normalizeSleeperSize(legacySize: unknown): KitSize | undefined {
+  if (typeof legacySize !== 'string') return undefined;
+  if ((KIT_SIZES as readonly string[]).includes(legacySize)) return legacySize as KitSize;
+  const upper = legacySize.toUpperCase();
+  if (['S', 'M'].includes(upper)) return 'S/M';
+  if (['L', 'XL'].includes(upper)) return 'L/XL';
+  if (upper === 'XXL') return 'XXL';
+  return undefined;
+}
+
+function migrateLegacyRecord(raw: unknown): Record<string, ComfortKitProfile> {
+  if (!raw || typeof raw !== 'object') return {};
+  const migrated: Record<string, ComfortKitProfile> = {};
+
+  for (const [key, value] of Object.entries(raw as Record<string, any>)) {
+    if (!value || typeof value !== 'object') continue;
+    const pajamaSize = normalizePajamaSize(value.pajamaSize ?? value.hoodieSize ?? value.pantsSize);
+    const sleeperSize = normalizeSleeperSize(value.sleeperSize ?? value.slipperSize);
+
+    // Solo conservar perfiles donde al menos una talla pueda determinarse de forma segura
+    if (pajamaSize || sleeperSize) {
+      migrated[key] = {
+        travelerId: typeof value.travelerId === 'string' && value.travelerId ? value.travelerId : key,
+        pajamaSize,
+        sleeperSize,
+        updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : new Date().toISOString(),
+      };
+    }
+  }
+
+  return migrated;
+}
 
 function readAll(): Record<string, ComfortKitProfile> {
   if (typeof localStorage === 'undefined') return {};
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Record<string, ComfortKitProfile>) : {};
+    const rawV2 = localStorage.getItem(STORAGE_KEY_V2);
+    if (rawV2) {
+      return JSON.parse(rawV2) as Record<string, ComfortKitProfile>;
+    }
+
+    // Si no existe v2, revisar si hay datos del esquema anterior para migrarlos
+    const rawLegacy = localStorage.getItem(STORAGE_KEY_LEGACY);
+    if (rawLegacy) {
+      const parsedLegacy = JSON.parse(rawLegacy);
+      const migrated = migrateLegacyRecord(parsedLegacy);
+      if (Object.keys(migrated).length > 0) {
+        writeAll(migrated);
+        return migrated;
+      }
+    }
+    return {};
   } catch {
     return {};
   }
@@ -37,7 +91,11 @@ function readAll(): Record<string, ComfortKitProfile> {
 
 function writeAll(profiles: Record<string, ComfortKitProfile>): void {
   if (typeof localStorage === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
+  try {
+    localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(profiles));
+  } catch {
+    // Si la cuota de almacenamiento está llena o falla, evitamos romper la app
+  }
 }
 
 export function loadComfortKitProfiles(): Record<string, ComfortKitProfile> {
@@ -50,9 +108,8 @@ export function loadComfortKitProfiles(): Record<string, ComfortKitProfile> {
     const travelerId = deriveTravelerId(seed);
     seeded[travelerId] = {
       travelerId,
-      hoodieSize: seed.hoodieSize,
-      pantsSize: seed.pantsSize,
-      slipperSize: seed.slipperSize,
+      pajamaSize: seed.pajamaSize,
+      sleeperSize: seed.sleeperSize,
       updatedAt: new Date(Date.now() - seed.daysAgo * 24 * 60 * 60 * 1000).toISOString(),
     };
   }
